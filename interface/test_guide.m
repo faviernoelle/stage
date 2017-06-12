@@ -75,6 +75,8 @@ varargout{1} = handles.output;
 
 % --- Executes on button press in pushbutton1.
 function pushbutton1_Callback(hObject, eventdata, handles)
+disp('boutton appuyé')
+
 % hObject    handle to pushbutton1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -82,12 +84,22 @@ function pushbutton1_Callback(hObject, eventdata, handles)
 
 % --- Executes on slider movement.
 function slider1_Callback(hObject, eventdata, handles)
+
 % hObject    handle to slider1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+
+min = get( hObject,'Min') ;
+max = get( hObject,'Max') ;
+valeur = get( hObject,'Value') ;
+disp('modification boutton')
+disp(['valeur du bouton = ' num2str(valeur)])
+
+
+
 
 
 % --- Executes during object creation, after setting all properties.
@@ -109,7 +121,21 @@ function radiobutton1_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of radiobutton1
+% case 1
+%     disp('truc selectionné')
+%     switch case
+%     end
+% 
+%     
+% case 2 
+%     disp('truc non selectionné')
+%     switch case
+%     end
 
+    
+        
+% else disp('truc non sélectionné') 
+end
 
 % --- Executes on button press in checkbox1.
 function checkbox1_Callback(hObject, eventdata, handles)

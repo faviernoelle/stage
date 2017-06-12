@@ -31,7 +31,13 @@ stem(u5)
 stem(u6)
 stem(u7)
 hold off
+legend('u1','u2','u3','u4','u5','u6','u7')
 
 u=[u1 u2 u3 u4 u5 u6 u7];
 
-%writetable(u)
+% writetable(u, 'test')
+
+
+
+
+

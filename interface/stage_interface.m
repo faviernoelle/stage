@@ -4,6 +4,6 @@
 
 % Internship supervisor : Thao Dang
 
-% Other users : Alexandre Donze      &       
+% Other users : Alexandre Donze      &       Santosh Arvind Adimoolam
 
 %% 
