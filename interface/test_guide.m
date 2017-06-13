@@ -75,7 +75,8 @@ varargout{1} = handles.output;
 
 % --- Executes on button press in pushbutton1.
 function pushbutton1_Callback(hObject, eventdata, handles)
-disp('boutton appuyé')
+% afficher 'bouton appuyé' quand on appuie sur le bouton
+disp('bouton appuyé')
 
 % hObject    handle to pushbutton1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -95,7 +96,7 @@ function slider1_Callback(hObject, eventdata, handles)
 min = get( hObject,'Min') ;
 max = get( hObject,'Max') ;
 valeur = get( hObject,'Value') ;
-disp('modification boutton')
+disp('modification bouton')
 disp(['valeur du bouton = ' num2str(valeur)])
 
 
@@ -132,10 +133,12 @@ function radiobutton1_Callback(hObject, eventdata, handles)
 %     switch case
 %     end
 
-    
-        
-% else disp('truc non sélectionné') 
+if handles.radiobutton1.Value ==1
+   disp('truc appyué') 
+else disp('truc non appuyé')
 end
+% else disp('truc non sélectionné') 
+
 
 % --- Executes on button press in checkbox1.
 function checkbox1_Callback(hObject, eventdata, handles)
