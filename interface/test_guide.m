@@ -22,7 +22,7 @@ function varargout = test_guide(varargin)
 
 % Edit the above text to modify the response to help test_guide
 
-% Last Modified by GUIDE v2.5 06-Jun-2017 11:39:54
+% Last Modified by GUIDE v2.5 14-Jun-2017 09:56:37
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -55,8 +55,10 @@ function test_guide_OpeningFcn(hObject, eventdata, handles, varargin)
 % Create data to plot
 [x,y] = meshgrid(0:2:40) ;
 % Set the current data value
-handles.current_data = valeur_to_plot ;
-pushButton1(handles.current_data)
+load Experience1
+
+handles.current_data = Out_exp1.clusters{1, 1}.pts(1,:) ;
+plot(handles.current_data)
 
 
 % Choose default command line output for test_guide
@@ -232,3 +234,12 @@ function togglebutton1_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of togglebutton1
+
+
+% --- Executes during object creation, after setting all properties.
+function GRAPH_graph1_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to GRAPH_graph1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: place code in OpeningFcn to populate GRAPH_graph1
