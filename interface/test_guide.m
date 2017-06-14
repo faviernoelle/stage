@@ -52,6 +52,13 @@ function test_guide_OpeningFcn(hObject, eventdata, handles, varargin)
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to test_guide (see VARARGIN)
 
+% Create data to plot
+[x,y] = meshgrid(0:2:40) ;
+% Set the current data value
+handles.current_data = valeur_to_plot ;
+pushButton1(handles.current_data)
+
+
 % Choose default command line output for test_guide
 handles.output = hObject;
 
