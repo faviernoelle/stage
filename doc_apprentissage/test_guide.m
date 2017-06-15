@@ -237,9 +237,17 @@ function togglebutton1_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function GRAPH_graph1_CreateFcn(hObject, eventdata, handles)
+ function GRAPH_graph1_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to GRAPH_graph1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
 % Hint: place code in OpeningFcn to populate GRAPH_graph1
+disp('je passe dans la fonction du graph')
+disp('blabla')
+
+set(hObject,'WindowButtonMotionFcn',@MouseMove);
+set(hObject,'WindowButtonDownFcn',@MouseClick);
+set(hObject,'WindowScrollWheelFcn',@MouseScroll);
+set(hObject,'KeyPressFcn',@KeyPress )
+
