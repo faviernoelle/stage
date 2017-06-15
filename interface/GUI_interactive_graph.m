@@ -22,7 +22,7 @@ function varargout = GUI_interactive_graph(varargin)
 
 % Edit the above text to modify the response to help GUI_interactive_graph
 
-% Last Modified by GUIDE v2.5 14-Jun-2017 16:34:57
+% Last Modified by GUIDE v2.5 15-Jun-2017 13:13:59
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -52,8 +52,10 @@ function GUI_interactive_graph_OpeningFcn(hObject, eventdata, handles, varargin)
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to GUI_interactive_graph (see VARARGIN)
 
+
 % Choose default command line output for GUI_interactive_graph
 handles.output = hObject;
+
 
 % Update handles structure
 guidata(hObject, handles);
@@ -73,4 +75,64 @@ function varargout = GUI_interactive_graph_OutputFcn(hObject, eventdata, handles
 varargout{1} = handles.output;
 
 
+% --- Executes on button press in BUT_robustness.
+function BUT_robustness_Callback(hObject, eventdata, handles)
+% hObject    handle to BUT_robustness (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
 
+a = str2num(handles.TXT_value_X_plot.String) ;
+b = str2num(handles.TXT_value_y_plot.String) ;
+
+disp('button pressed')
+
+
+interactive_graph(a, b)
+
+
+
+
+
+function TXT_value_y_plot_Callback(hObject, eventdata, handles)
+% hObject    handle to TXT_value_y_plot (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of TXT_value_y_plot as text
+%        str2double(get(hObject,'String')) returns contents of TXT_value_y_plot as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function TXT_value_y_plot_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to TXT_value_y_plot (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function TXT_value_X_plot_Callback(hObject, eventdata, handles)
+% hObject    handle to TXT_value_X_plot (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of TXT_value_X_plot as text
+%        str2double(get(hObject,'String')) returns contents of TXT_value_X_plot as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function TXT_value_X_plot_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to TXT_value_X_plot (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end

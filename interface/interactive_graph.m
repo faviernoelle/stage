@@ -4,7 +4,6 @@ if nargin == 0
   clear all
 end
 
-close all
 clc
 
 fprintf(['--------------------\n', ...
@@ -13,23 +12,22 @@ fprintf(['--------------------\n', ...
 
 load Experience1
 
-global Out_exp1 i j 
+global Out_exp1 colone1 colone2
 
-% i = 1 ;
-% j = 2 ;
+colone1 = i ;
+colone2 = j ;
+
 
 H = figure();
-map = [0.9, 0, 0
-       0.87, 0.42, 0.078
-        0.145, 0.99, 0.91
-       0, 0, 0.9]
-    
-colormap(map)
+
+
+colormap(jet_inverted)
+
 x = Out_exp1.clusters{1, 1}.pts(:,i);
 y = Out_exp1.clusters{1, 1}.pts(:,j);
 c = Out_exp1.clusters{1, 1}.vals(:)
 scatter(x,y,[],c)
-     
+colorbar('')
             
 set(H, 'MenuBar','none');
 set(H,'ToolBar','none');
@@ -41,7 +39,6 @@ set(H,'WindowButtonDownFcn',@MouseClick);
 set(H,'WindowScrollWheelFcn',@MouseScroll);
 set(H,'KeyPressFcn',@KeyPress ); 
 
-%  axis([0 10 0 40])
  
  global pointeurX pointeurY
             
@@ -57,20 +54,20 @@ pointeurY=CurrentPoint(2,2);
 
 % disp('valeur actuelle du pointeur :', num2str(CurrentPoint))
 
-function MouseClick(~,~, i, j)
+function MouseClick(~,~)
 
-global pointeurX pointeurY Out_exp1 i j 
+global pointeurX pointeurY Out_exp1 colone1 colone2
 if strcmpi(get(gcf,'SelectionType'), 'Normal')
     disp('left click')
 
 % Left click
     epsilon = 0.3 ;
     for l=1:50 
-        if abs(pointeurY - Out_exp1.clusters{1, 1}.pts(l,j))< epsilon & ...
-                abs(pointeurX - Out_exp1.clusters{1, 1}.pts(l,i))< epsilon 
+        if abs(pointeurY - Out_exp1.clusters{1, 1}.pts(l,colone2))< epsilon & ...
+                abs(pointeurX - Out_exp1.clusters{1, 1}.pts(l,colone1))< epsilon 
             disp('robustness value of selected point :')
             Out_exp1.clusters{1, 1}.vals(l)
-            text(Out_exp1.clusters{1, 1}.pts(l,i),Out_exp1.clusters{1, 1}.pts(l,j), ...
+            text(Out_exp1.clusters{1, 1}.pts(l,colone1),Out_exp1.clusters{1, 1}.pts(l,colone2), ...
             num2str(Out_exp1.clusters{1, 1}.vals(l)))
         else              
         end

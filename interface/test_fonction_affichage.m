@@ -13,6 +13,6 @@ clear all
 close all
 clc 
 
-interactive_graph(5, 8)
+
 
 
