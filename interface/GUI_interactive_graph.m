@@ -22,7 +22,7 @@ function varargout = GUI_interactive_graph(varargin)
 
 % Edit the above text to modify the response to help GUI_interactive_graph
 
-% Last Modified by GUIDE v2.5 15-Jun-2017 13:13:59
+% Last Modified by GUIDE v2.5 15-Jun-2017 16:24:55
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -52,6 +52,17 @@ function GUI_interactive_graph_OpeningFcn(hObject, eventdata, handles, varargin)
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to GUI_interactive_graph (see VARARGIN)
 
+% Put here what you want to plot
+
+
+
+
+% this is just to test the code
+% to be deleted until 'end deletion' 
+load Experience1
+global out          
+out = Out_exp1 ;
+% end deletion
 
 % Choose default command line output for GUI_interactive_graph
 handles.output = hObject;
@@ -81,13 +92,17 @@ function BUT_robustness_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-a = str2num(handles.TXT_value_X_plot.String) ;
-b = str2num(handles.TXT_value_y_plot.String) ;
+global out     % to be deleted 
+
+% recover x and y who wnat to plot
+x = str2num(handles.TXT_value_X_plot.String) ;
+y = str2num(handles.TXT_value_y_plot.String) ;
 
 disp('button pressed')
 
-
-interactive_graph(a, b)
+% call of the function to plot the x and y selected 
+% to have more detail tape 'help(interactive_graph)'
+interactive_graph(out, x, y)
 
 
 
@@ -132,6 +147,52 @@ function TXT_value_X_plot_CreateFcn(hObject, eventdata, handles)
 % handles    empty - handles not created until after all CreateFcns called
 
 % Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on selection change in popupmenu1.
+function popupmenu1_Callback(hObject, eventdata, handles)
+% hObject    handle to popupmenu1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns popupmenu1 contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from popupmenu1
+
+
+% --- Executes during object creation, after setting all properties.
+function popupmenu1_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to popupmenu1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on selection change in listbox1.
+function listbox1_Callback(hObject, eventdata, handles)
+% hObject    handle to listbox1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns listbox1 contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from listbox1
+
+
+% --- Executes during object creation, after setting all properties.
+function listbox1_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to listbox1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: listbox controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
