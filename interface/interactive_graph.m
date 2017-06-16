@@ -93,7 +93,7 @@ if strcmpi(get(gcf,'SelectionType'), 'Normal')
     % and the value X of the mouse and the same for Y and if both values
     % are smaller than epsilon write on the graph the robustness value of
     % the point
-    for l=1:50 
+    for l=1:length(values.clusters{column}.pts)
         % test the difference between position of the point and position of
         % the mouse
         if abs(pointeurY - values.clusters{column}.pts(l,colone2))< epsilon & ...
