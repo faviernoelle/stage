@@ -19,9 +19,15 @@ load Experience1
 % plot_rectangles(Out_exp1, 5, 8)
 
 
-
-% figure()
 % interactive_graph(Out_exp1, 1, 2, 1)
 
 
 GUI_interactive_graph
+
+
+% GUI_interactive_graph_all_samples(Out_exp1.all_samples,1)
+
+
+% interactive_graph_all_samples(Out_exp1.all_samples, 1, 2, 1)
+
+
