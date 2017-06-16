@@ -93,7 +93,7 @@ function BUT_robustness_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-global out     % to be deleted 
+global out
 
 % recover x and y you wnat to plot
 x = str2num(handles.TXT_value_X_plot.String) ;
