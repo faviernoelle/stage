@@ -22,7 +22,7 @@ function varargout = GUI_interactive_graph(varargin)
 
 % Edit the above text to modify the response to help GUI_interactive_graph
 
-% Last Modified by GUIDE v2.5 15-Jun-2017 16:24:55
+% Last Modified by GUIDE v2.5 16-Jun-2017 13:00:23
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -52,9 +52,6 @@ function GUI_interactive_graph_OpeningFcn(hObject, eventdata, handles, varargin)
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to GUI_interactive_graph (see VARARGIN)
 
-% Put here what you want to plot
-
-
 
 
 % this is just to test the code
@@ -63,6 +60,10 @@ load Experience1
 global out          
 out = Out_exp1 ;
 % end deletion
+
+
+
+
 
 % Choose default command line output for GUI_interactive_graph
 handles.output = hObject;
@@ -94,15 +95,18 @@ function BUT_robustness_Callback(hObject, eventdata, handles)
 
 global out     % to be deleted 
 
-% recover x and y who wnat to plot
+% recover x and y you wnat to plot
 x = str2num(handles.TXT_value_X_plot.String) ;
 y = str2num(handles.TXT_value_y_plot.String) ;
 
 disp('button pressed')
 
+
+
 % call of the function to plot the x and y selected 
 % to have more detail tape 'help(interactive_graph)'
-interactive_graph(out, x, y)
+column = handles.POPUP_rectangle.Value
+interactive_graph(out, x, y, column)
 
 
 
@@ -153,19 +157,19 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on selection change in popupmenu1.
-function popupmenu1_Callback(hObject, eventdata, handles)
-% hObject    handle to popupmenu1 (see GCBO)
+% --- Executes on selection change in POPUP_rectangle.
+function POPUP_rectangle_Callback(hObject, eventdata, handles)
+% hObject    handle to POPUP_rectangle (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: contents = cellstr(get(hObject,'String')) returns popupmenu1 contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from popupmenu1
+% Hints: contents = cellstr(get(hObject,'String')) returns POPUP_rectangle contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from POPUP_rectangle
 
 
 % --- Executes during object creation, after setting all properties.
-function popupmenu1_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to popupmenu1 (see GCBO)
+function POPUP_rectangle_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to POPUP_rectangle (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -193,6 +197,48 @@ function listbox1_CreateFcn(hObject, eventdata, handles)
 % handles    empty - handles not created until after all CreateFcns called
 
 % Hint: listbox controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in BUT_plot_rectangles.
+function BUT_plot_rectangles_Callback(hObject, eventdata, handles)
+
+global out
+% hObject    handle to BUT_plot_rectangles (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+x = str2num(handles.TXT_value_X_plot.String) ;
+y = str2num(handles.TXT_value_y_plot.String) ;
+
+val = get(handles.TXT_Name_data,'String') ;
+
+
+% clf(handles.Graph_graph1)
+
+plot_rectangles(out, x, y)
+
+
+
+function TXT_Name_data_Callback(hObject, eventdata, handles)
+% hObject    handle to TXT_Name_data (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of TXT_Name_data as text
+%        str2double(get(hObject,'String')) returns contents of TXT_Name_data as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function TXT_Name_data_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to TXT_Name_data (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
