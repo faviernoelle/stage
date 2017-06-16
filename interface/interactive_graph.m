@@ -111,7 +111,7 @@ if strcmpi(get(gcf,'SelectionType'), 'Normal')
             num2str(values.clusters{column}.vals(l)))
             text(values.clusters{column}.pts(l,colone1)-1,...
                 values.clusters{column}.pts(l,colone2)-1, ...
-            [num2str(values.clusters{column}.pts(l,colone1)); num2str(values.clusters{column}.pts(l,colone2))])
+            ['x = ' num2str(values.clusters{column}.pts(l,colone1)); 'y = ' num2str(values.clusters{column}.pts(l,colone2))])
         
         else
             % Do nothing
