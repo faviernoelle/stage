@@ -1,5 +1,5 @@
-function interactive_graph(Out, i, j, varargin)
-%
+function interactive_graph(Out, i, j, rectangle, varargin)
+% interactive_graph(Out, i, j, varargin)
 % 
 % 
 % 
@@ -18,11 +18,12 @@ clc
 
 
 
-global colone1 colone2 values
+global colone1 colone2 values column
 
 colone1 = i ;
 colone2 = j ;
 values = Out
+column = rectangle
 
 H = figure();
 
@@ -35,12 +36,15 @@ H = figure();
 colormap(jet_inverted)
 
 % selection of the points
-x = Out.clusters{1}.pts(:,i);
-y = Out.clusters{1}.pts(:,j);
+x = Out.clusters{column}.pts(:,i);
+y = Out.clusters{column}.pts(:,j);
 % Selection of the data for the range of the color
-c = Out.clusters{1}.vals(:)
+c = Out.clusters{column}.vals(:)
+
 % plot
 scatter(x,y,[],c)
+
+% add color bar
 colorbar('')
             
 % set option of graphic 
@@ -59,40 +63,52 @@ disp('fenetre ouverte')
 
 function MouseMove(~,~)
 
-% function which act when we move the mouse (get the current position of
-% the mouse)
-global pointeurX pointeurY
+% function which act when the mouse is being moved (get the current 
+% position of the mouse)
 CurrentPoint = get(gca,'CurrentPoint');
-% CurrentPoint
+% load the current position of the mouse in global variables
+global pointeurX pointeurY
 pointeurX=CurrentPoint(1,1);
 pointeurY=CurrentPoint(2,2);
 
-% disp('valeur actuelle du pointeur :', num2str(CurrentPoint))
 
 function MouseClick(~,~)
 
 % function which act when we click with the mouse :
-% in every case disp (left click) and
+% When we do a left click in every case disp (left click) and
     % if it's on a point -> plot robustness value
     % if it's not on a point -> do nothing
     
     
-global pointeurX pointeurY colone1 colone2 values
+global pointeurX pointeurY colone1 colone2 values column
 
 % Left click
 if strcmpi(get(gcf,'SelectionType'), 'Normal')
     disp('left click')
 
-
+% set value epsilon such that if the mouse is to far away from the point do
+% nothin
     epsilon = 0.3 ;
+    % for every point test the distance between the value X of the point
+    % and the value X of the mouse and the same for Y and if both values
+    % are smaller than epsilon write on the graph the robustness value of
+    % the point
     for l=1:50 
-        if abs(pointeurY - values.clusters{1, 1}.pts(l,colone2))< epsilon & ...
-                abs(pointeurX - values.clusters{1, 1}.pts(l,colone1))< epsilon 
+        % test the difference between position of the point and position of
+        % the mouse
+        if abs(pointeurY - values.clusters{column}.pts(l,colone2))< epsilon & ...
+                abs(pointeurX - values.clusters{column}.pts(l,colone1))< epsilon
+            
+%             disp robustness value
             disp('robustness value of selected point :')
-            values.clusters{1, 1}.vals(l)
-            text(values.clusters{1, 1}.pts(l,colone1),values.clusters{1, 1}.pts(l,colone2), ...
-            num2str(values.clusters{1, 1}.vals(l)))
-        else              
+            values.clusters{column}.vals(l)
+            
+            % Write robustness value on the graph
+            text(values.clusters{column}.pts(l,colone1),...
+                values.clusters{column}.pts(l,colone2), ...
+            num2str(values.clusters{column}.vals(l)))
+        else
+            % Do nothing
         end
     end
     
@@ -103,9 +119,11 @@ end
 
 
 function MouseScroll(~,Event)
+% Not used for now
 disp('use of mouse scroll')
 
 function KeyPress(~,Event)
+% Not used for now
 disp('a key has been pressed')
 
 
