@@ -21,6 +21,7 @@ load Experience1
 
 
 % figure()
-interactive_graph(Out_exp1, 1, 2, 1)
+% interactive_graph(Out_exp1, 1, 2, 1)
 
 
+GUI_interactive_graph

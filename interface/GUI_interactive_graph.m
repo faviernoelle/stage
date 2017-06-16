@@ -214,7 +214,6 @@ global out
 x = str2num(handles.TXT_value_X_plot.String) ;
 y = str2num(handles.TXT_value_y_plot.String) ;
 
-clf
 
 plot_rectangles(out, x, y)
 
