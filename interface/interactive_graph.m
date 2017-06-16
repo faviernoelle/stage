@@ -103,10 +103,16 @@ if strcmpi(get(gcf,'SelectionType'), 'Normal')
             disp('robustness value of selected point :')
             values.clusters{column}.vals(l)
             
-            % Write robustness value on the graph
+            % Write robustness value on the graph, the first two values are
+            % used to define the position where you want to plot write the
+            % text
             text(values.clusters{column}.pts(l,colone1),...
                 values.clusters{column}.pts(l,colone2), ...
             num2str(values.clusters{column}.vals(l)))
+            text(values.clusters{column}.pts(l,colone1)-1,...
+                values.clusters{column}.pts(l,colone2)-1, ...
+            [num2str(values.clusters{column}.pts(l,colone1)); num2str(values.clusters{column}.pts(l,colone2))])
+        
         else
             % Do nothing
         end

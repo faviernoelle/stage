@@ -8,6 +8,7 @@ function plot_rectangles(out,i,j)
 % h = height of the rectangle
 
 % Initial rectangle which contains the other ones
+
 rectangle('position',[0,0,40,40])
 hold on
 

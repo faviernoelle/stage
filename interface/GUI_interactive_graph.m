@@ -22,7 +22,7 @@ function varargout = GUI_interactive_graph(varargin)
 
 % Edit the above text to modify the response to help GUI_interactive_graph
 
-% Last Modified by GUIDE v2.5 16-Jun-2017 13:00:23
+% Last Modified by GUIDE v2.5 16-Jun-2017 13:38:43
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -55,11 +55,11 @@ function GUI_interactive_graph_OpeningFcn(hObject, eventdata, handles, varargin)
 
 
 % this is just to test the code
-% to be deleted until 'end deletion' 
-load Experience1
-global out          
-out = Out_exp1 ;
-% end deletion
+% % to be deleted until 'end deletion' 
+% load Experience1
+% global out          
+% out = Out_exp1 ;
+% % end deletion
 
 
 
@@ -214,10 +214,7 @@ global out
 x = str2num(handles.TXT_value_X_plot.String) ;
 y = str2num(handles.TXT_value_y_plot.String) ;
 
-val = get(handles.TXT_Name_data,'String') ;
-
-
-% clf(handles.Graph_graph1)
+clf
 
 plot_rectangles(out, x, y)
 
@@ -243,3 +240,17 @@ function TXT_Name_data_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+% --- Executes on button press in BUT_load_data.
+function BUT_load_data_Callback(hObject, eventdata, handles)
+% hObject    handle to BUT_load_data (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+val = handles.TXT_Name_data.String ;
+load(val)
+global out
+out = Out_exp1 ;
+
+disp('Data loaded')

@@ -16,11 +16,11 @@ clc
 load Experience1
 
 
-plot_rectangles(Out_exp1, 1, 2)
-% revoir cette fonction
+% plot_rectangles(Out_exp1, 5, 8)
 
 
 
-% interactive_graph(Out_exp1, 5, 8)
+% figure()
+interactive_graph(Out_exp1, 1, 2, 1)
 
 
