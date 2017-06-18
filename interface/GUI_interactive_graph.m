@@ -60,8 +60,8 @@ function GUI_interactive_graph_OpeningFcn(hObject, eventdata, handles, varargin)
 % global out          
 % out = Out_exp1 ;
 % % end deletion
-
-
+disp('- Adding to path all subfolders of the project')
+addPath()
 
 
 
