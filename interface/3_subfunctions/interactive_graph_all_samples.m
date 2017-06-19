@@ -10,19 +10,12 @@ if nargin == 0
   clear all
 end
 
-clc
 
-% fprintf(['--------------------\n', ...
-%   'B-spline Lab\nPress ''H'' for help.\n', ...
-%   '--------------------\n\n'])
+global COLONE1 COLONE2 VALUES
 
-
-
-global colone1 colone2 values
-
-colone1 = i ;
-colone2 = j ;
-values = Out
+COLONE1 = i ;
+COLONE2 = j ;
+VALUES = Out ;
 % column = rectangle
 
 H = figure();
@@ -39,7 +32,7 @@ colormap(jet_inverted)
 x = Out.pts(:,i);
 y = Out.pts(:,j);
 % Selection of the data for the range of the color
-c = Out.vals(:)
+c = Out.vals(:) ;
 
 % plot
 scatter(x,y,[],c)
@@ -67,59 +60,61 @@ function MouseMove(~,~)
 % position of the mouse)
 CurrentPoint = get(gca,'CurrentPoint');
 % load the current position of the mouse in global variables
-global pointeurX pointeurY
-pointeurX=CurrentPoint(1,1);
-pointeurY=CurrentPoint(2,2);
+global POINTEUR_X POINTEUR_Y
+POINTEUR_X=CurrentPoint(1,1);
+POINTEUR_Y=CurrentPoint(2,2);
 
 
 function MouseClick(~,~)
 
-% function which act when we click with the mouse :
+% function which act when the click is used :
 % When we do a left click in every case disp (left click) and
     % if it's on a point -> plot robustness value
     % if it's not on a point -> do nothing
+% click gauche clear texts on the figure
     
     
-global pointeurX pointeurY colone1 colone2 values column
+global POINTEUR_X POINTEUR_Y COLONE1 COLONE2 VALUES column
 
 % Left click
 if strcmpi(get(gcf,'SelectionType'), 'Normal')
-    disp('left click')
 
 % set value epsilon such that if the mouse is to far away from the point do
 % nothin
-    epsilon = 0.3 ;
+    PARAM.epsilon = 0.3 ;
     % for every point test the distance between the value X of the point
     % and the value X of the mouse and the same for Y and if both values
     % are smaller than epsilon write on the graph the robustness value of
     % the point
-    for l=1:length(values.pts)
+    for l=1:length(VALUES.pts)
         % test the difference between position of the point and position of
         % the mouse
-        val_a_tester_Y = values.pts(l,colone2) ;
-        val_a_tester_X = values.pts(l,colone1) ;
-        if abs(pointeurY - val_a_tester_Y )< epsilon & ...
-                abs(pointeurX - val_a_tester_X)< epsilon
+        val_a_tester_Y = VALUES.pts(l,COLONE2) ;
+        val_a_tester_X = VALUES.pts(l,COLONE1) ;
+        if abs(POINTEUR_Y - val_a_tester_Y )< PARAM.epsilon & ...
+                abs(POINTEUR_X - val_a_tester_X)< PARAM.epsilon
+           
             
-%             disp robustness value
-            disp('robustness value of selected point :')
-            values.vals(l)
+            % Part of the code to get the parameters to put the texts at the right position
+%             min = values.regions{column}(colone2,1);
+%             max = values.regions{column}(colone2,2);
+            min = 0;
+            max = 40 ;
+            PARAM.affich_text_robu = 1.5/40 ; % parameter calculed to optimize visualization
+            delta = (max-min)*(PARAM.affich_text_robu) ;
+            
             
             % Write robustness value on the graph, the first two values are
             % used to define the position where you want to write the
             % text and the next one is the value you want to plot on the
             % graph
-            text(values.pts(l,colone1),...
-                values.pts(l,colone2), ...
-            num2str(values.vals(l)))
-%         pos_aff_x = values.pts(l,colone1)-1 ;
-%         pos_aff_y = values.pts(l,colone2)-1 ;
-           text(double(values.pts(l,colone1)-3),...
-                double(values.pts(l,colone2)-3), ...
-            ['x = ' num2str(values.pts(l,colone1)); 'y = ' num2str(values.pts(l,colone2))])
-%         
-        disp(num2str(values.pts(l,colone1)))
-        disp(num2str(values.pts(l,colone2)))
+            text(VALUES.pts(l,COLONE1), VALUES.pts(l,COLONE2), ...
+            num2str(VALUES.vals(l)))
+           text(double(VALUES.pts(l,COLONE1)), double(VALUES.pts(l,COLONE2)-delta), ...
+            ['x = ' num2str(VALUES.pts(l,COLONE1))])
+           text(double(VALUES.pts(l,COLONE1)), double(VALUES.pts(l,COLONE2)-2 * delta), ...
+            ['y = ' num2str(VALUES.pts(l,COLONE2))])
+
 
         else
             % Do nothing
@@ -128,7 +123,8 @@ if strcmpi(get(gcf,'SelectionType'), 'Normal')
     
 % Right click
 elseif strcmpi(get(gcf,'SelectionType'), 'Alt')
-    disp('right click')
+    allText = findobj(gca,'Type','Text') ;
+    delete(allText)
 end
 
 
