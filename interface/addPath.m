@@ -7,3 +7,5 @@ addpath(genpath('3_subfunctions'))
 addpath(genpath('4_tests'))
 
 addpath(genpath('5_results'))
+
+addpath(genpath('6_images'))
