@@ -21,9 +21,9 @@ J(g,2) = u(1:length(g));
 J(b,3) = u(end-length(b)+1:end);
 
 % Modification to invert the color
-G=zeros(m,3)
+G=zeros(m,3) ;
 for i=1:length(J)
-    G(i,:) = J(end-i+1,:)
+    G(i,:) = J(end-i+1,:) ;
 end
 
 

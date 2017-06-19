@@ -8,7 +8,6 @@ function plot_rectangles(out,i,j)
 % h = height of the rectangle
 
 % Initial rectangle which contains the other ones
-
 rectangle('position',[0,0,40,40])
 hold on
 
@@ -51,28 +50,28 @@ colormap(jet_inverted)
 % selection of the point to plot in the first rectangle
 x1 = out.clusters{1}.pts(:,i);
 y1 = out.clusters{1}.pts(:,j);
-c1 = out.clusters{1}.vals(:)
+c1 = out.clusters{1}.vals(:) ;
 scatter(x1,y1,[],c1)
 
 % selection of the point to plot in the second rectangle
 x2 = out.clusters{2}.pts(:,i);
 y2 = out.clusters{2}.pts(:,j);
-c2 = out.clusters{2}.vals(:)
-scatter(x2,y2,[],c2)
+c2 = out.clusters{2}.vals(:) ;
+scatter(x2,y2,[],c2) 
 
 % selection of the point to plot in the third rectangle
 x3 = out.clusters{3}.pts(:,i);
 y3 = out.clusters{3}.pts(:,j);
-c3 = out.clusters{3}.vals(:)
+c3 = out.clusters{3}.vals(:) ;
 scatter(x3,y3,[],c3)
 
 % selection of the point to plot in the forth rectangle
 x4 = out.clusters{4}.pts(:,i);
 y4 = out.clusters{4}.pts(:,j);
-c4 = out.clusters{4}.vals(:)
+c4 = out.clusters{4}.vals(:) ;
 scatter(x4,y4,[],c4)
 
 % add colorbar
 colorbar('')
 
- hold off
+hold off
