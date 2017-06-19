@@ -1,57 +1,53 @@
 function interactive_graph(Out, i, j, rectangle, varargin)
-% interactive_graph(Out, i, j, varargin)
-% 
-% 
-% 
-% 
 
+% interactive_graph(Out, i, j, varargin)
+% a compléter
+% 
+% 
+% 
 
 if nargin == 0
   clear all
 end
 
-clc
-
 % fprintf(['--------------------\n', ...
 %   'B-spline Lab\nPress ''H'' for help.\n', ...
 %   '--------------------\n\n'])
 
+global COLONE1 COLONE2 VALUES COLUMN
 
+COLONE1 = i ;
+COLONE2 = j ;
+VALUES = Out ;
+COLUMN = rectangle ;
 
-global colone1 colone2 values column
-
-colone1 = i ;
-colone2 = j ;
-values = Out
-column = rectangle
-
-H = figure();
-
-
-
-% plot points in the figure
-
+H = figure() ;
 
 % Définition of color used to plot
 colormap(jet_inverted)
 
 % selection of the points
-x = Out.clusters{column}.pts(:,i);
-y = Out.clusters{column}.pts(:,j);
+x = Out.clusters{COLUMN}.pts(:,i);
+y = Out.clusters{COLUMN}.pts(:,j);
 % Selection of the data for the range of the color
-c = Out.clusters{column}.vals(:)
+c = Out.clusters{COLUMN}.vals(:) ;
 
 % plot
 scatter(x,y,[],c)
+xlabel(['Projection dimension ', num2str(COLONE1)])
+ylabel(['Projection dimension ', num2str(COLONE2)])
 
 % add color bar
 colorbar('')
-            
+
 % set option of graphic 
 set(H, 'MenuBar','none');
 set(H,'ToolBar','none');
 set(H, 'Renderer','OpenGL');
 hold on
+
+% set dimension of the graphic
+% set(H, 'Position', [10 50 1350 687]);
 
 % set option of graphic to be able to use the mouse
 set(H,'WindowButtonMotionFcn',@MouseMove);
@@ -59,7 +55,6 @@ set(H,'WindowButtonDownFcn',@MouseClick);
 set(H,'WindowScrollWheelFcn',@MouseScroll);
 set(H,'KeyPressFcn',@KeyPress ); 
 
-disp('fenetre ouverte')
 
 function MouseMove(~,~)
 
@@ -67,52 +62,55 @@ function MouseMove(~,~)
 % position of the mouse)
 CurrentPoint = get(gca,'CurrentPoint');
 % load the current position of the mouse in global variables
-global pointeurX pointeurY
-pointeurX=CurrentPoint(1,1);
-pointeurY=CurrentPoint(2,2);
+global POINTEUR_X POINTEUR_Y
+POINTEUR_X=CurrentPoint(1,1);
+POINTEUR_Y=CurrentPoint(2,2);
 
 
 function MouseClick(~,~)
 
-% function which act when we click with the mouse :
+% function which act when the click is used :
 % When we do a left click in every case disp (left click) and
     % if it's on a point -> plot robustness value
     % if it's not on a point -> do nothing
+% click gauche clear texts on the figure
     
-    
-global pointeurX pointeurY colone1 colone2 values column
+global POINTEUR_X POINTEUR_Y COLONE1 COLONE2 VALUES COLUMN
 
 % Left click
 if strcmpi(get(gcf,'SelectionType'), 'Normal')
-    disp('left click')
 
 % set value epsilon such that if the mouse is to far away from the point do
 % nothin
-    epsilon = 0.3 ;
+    PARAM.epsilon = 0.3 ;
     % for every point test the distance between the value X of the point
     % and the value X of the mouse and the same for Y and if both values
     % are smaller than epsilon write on the graph the robustness value of
     % the point
-    for l=1:length(values.clusters{column}.pts)
+    for l=1:length(VALUES.clusters{COLUMN}.pts)
         % test the difference between position of the point and position of
         % the mouse
-        if abs(pointeurY - values.clusters{column}.pts(l,colone2))< epsilon & ...
-                abs(pointeurX - values.clusters{column}.pts(l,colone1))< epsilon
+        if abs(POINTEUR_Y - VALUES.clusters{COLUMN}.pts(l,COLONE2))< PARAM.epsilon & ...
+                abs(POINTEUR_X - VALUES.clusters{COLUMN}.pts(l,COLONE1))< PARAM.epsilon
             
-%             disp robustness value
-            disp('robustness value of selected point :')
-            values.clusters{column}.vals(l)
-            
+            % Part of the code to get the parameters to put the texts at the right position
+            min = VALUES.regions{COLUMN}(COLONE2,1);
+            max = VALUES.regions{COLUMN}(COLONE2,2);
+            PARAM.affich_text_robu = 1.5/40 ; % parameter calculed to optimize visualization
+            delta = (max-min)*(PARAM.affich_text_robu) ;
+
             % Write robustness value on the graph, the first two values are
-            % used to define the position where you want to plot write the
-            % text
-            text(values.clusters{column}.pts(l,colone1),...
-                values.clusters{column}.pts(l,colone2), ...
-            num2str(values.clusters{column}.vals(l)))
-            text(values.clusters{column}.pts(l,colone1)-1,...
-                values.clusters{column}.pts(l,colone2)-1, ...
-            ['x = ' num2str(values.clusters{column}.pts(l,colone1)); 'y = ' num2str(values.clusters{column}.pts(l,colone2))])
-        
+            % used to define the position where you want to write the text
+            text(VALUES.clusters{COLUMN}.pts(l,COLONE1),...
+                VALUES.clusters{COLUMN}.pts(l,COLONE2), ...
+            num2str(VALUES.clusters{COLUMN}.vals(l)))
+            text(VALUES.clusters{COLUMN}.pts(l,COLONE1),...
+                VALUES.clusters{COLUMN}.pts(l,COLONE2)-delta, ...
+                ['x = ' num2str(VALUES.clusters{COLUMN}.pts(l,COLONE1))]); 
+            text(VALUES.clusters{COLUMN}.pts(l,COLONE1),...
+                VALUES.clusters{COLUMN}.pts(l,COLONE2)-2*delta, ...    
+                ['y = ' num2str(VALUES.clusters{COLUMN}.pts(l,COLONE2))]);
+           
         else
             % Do nothing
         end
@@ -120,7 +118,8 @@ if strcmpi(get(gcf,'SelectionType'), 'Normal')
     
 % Right click
 elseif strcmpi(get(gcf,'SelectionType'), 'Alt')
-    disp('right click')
+    allText = findobj(gca,'Type','Text') ;
+    delete(allText)
 end
 
 
