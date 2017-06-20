@@ -11,40 +11,63 @@ function plot_rectangles(out,i,j)
 rectangle('position',[0,0,40,40])
 hold on
 
-
 % Rectangle created from the first regions
 rectangle('position',[out.regions{1}(i,1),out.regions{1}(j,1), ...
      (out.regions{1}(i,2)-out.regions{1}(i,1)),...
      (out.regions{1}(j,2)-out.regions{1}(j,1))])
 % Write the numero of the zone at the specified zone which is juste above 
 % and on the rigth of the bottom left of the rectangle
-text(out.regions{1}(i,1)+5,out.regions{1}(j,1)+5,'zone1')
+
+% if out.regions{1}(i,1) == 0
+%     position_x_1 = 0
+% else 
+%     position_x_1 = out.regions{1}(i,1)
+% end
+% 
+% if out.regions{1}(j,1) == 0
+%     position_y_1 = 0
+% else
+%     position_y_1 = out.regions{1}(j,1)
+% end
+
+text(out.regions{1}(i,1)+2,out.regions{1}(j,1)+6,'zone1')
+text(out.regions{1}(i,1)+2,out.regions{1}(j,1)+4, ['Size/x = ' num2str(out.regions{1}(i,:))])
+text(out.regions{1}(i,1)+2,out.regions{1}(j,1)+2, ['Size/y = ' num2str(out.regions{1}(j,:))])
+
 
 
 % Rectangle created from the segund regions
 rectangle('position',[out.regions{2}(i,1),out.regions{2}(j,1), ...
      (out.regions{2}(i,2)-out.regions{2}(i,1)),...
      (out.regions{2}(j,2)-out.regions{2}(j,1))])
-text(out.regions{2}(i,1)+5,out.regions{2}(j,1)+5,'zone2')
 
+text(out.regions{2}(i,1)+2,out.regions{2}(j,2)-2,'zone2')
+text(out.regions{2}(i,1)+2,out.regions{2}(j,2)-4, ['Size/x = ' num2str(out.regions{2}(i,:))])
+text(out.regions{2}(i,1)+2,out.regions{2}(j,2)-6, ['Size/y = ' num2str(out.regions{2}(j,:))])
 
 % Rectangle created from the third regions
 rectangle('position',[out.regions{3}(i,1),out.regions{3}(j,1), ...
      (out.regions{3}(i,2)-out.regions{3}(i,1)),...
      (out.regions{3}(j,2)-out.regions{3}(j,1))])
-text(out.regions{3}(i,1)+5,out.regions{3}(j,1)+5,'zone3')
 
+text(out.regions{3}(i,2)-10,out.regions{3}(j,2)-2,'zone3')
+text(out.regions{3}(i,2)-10,out.regions{3}(j,2)-4, ['Size/x = ' num2str(out.regions{3}(i,:))])
+text(out.regions{3}(i,2)-10,out.regions{3}(j,2)-6, ['Size/y = ' num2str(out.regions{3}(j,:))])
 
 % Rectangle created from the fourth regions
 rectangle('position',[out.regions{4}(i,1),out.regions{4}(j,1), ...
      (out.regions{4}(i,2)-out.regions{4}(i,1)),...
      (out.regions{4}(j,2)-out.regions{4}(j,1))])
-text(out.regions{4}(i,1)+5,out.regions{4}(j,1)+5,'zone4')
+
+text(out.regions{4}(i,2)-10,out.regions{4}(j,1)+6,'zone4')
+text(out.regions{4}(i,2)-10,out.regions{4}(j,1)+4, ['Size/x = ' num2str(out.regions{4}(i,:))])
+text(out.regions{4}(i,2)-10,out.regions{4}(j,1)+2, ['Size/y = ' num2str(out.regions{4}(j,:))])
 
 
 % Définition of color used to plot
 colormap(jet_inverted)
 
+disp('Afficher n rectangles et pas 4 cf faire boucle ')
 
 
 % selection of the point to plot in the first rectangle
