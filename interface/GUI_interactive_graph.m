@@ -57,7 +57,11 @@ disp('--------------------------------------------------------------------------
 disp(' Welcome ! ')
 disp('-------------------------------------------------------------------------------------')
 
-global DATA
+
+
+
+
+
 
 
 
@@ -68,12 +72,22 @@ disp('')
 disp('- Adding to path all subfolders of the project')
 addPath()
 
-disp('- Set Structure name (a modifier avec données d''Arvind)')
-load example_allExperimentData.mat % To be deleted
-set(handles.TXT_Name_data, 'String', fieldnames(DATA))
+% this is just to test the code
+% % to be deleted until 'end deletion' 
+load Experience1
+global out          
+out = Out_exp1 ;
+% % end deletion
+
+
+
+% global DATA
+% disp('- Set Structure name (a modifier avec données d''Arvind)')
+% load example_allExperimentData.mat % To be deleted
+% set(handles.TXT_Name_data, 'String', fieldnames(DATA))
 
 % Hide panel
-disp('- Hide panel')
+% disp('- Hide panel')
 set(handles.PANEL_projection_dimension, 'Visible', 'Off')
 set(handles.PANEL_Plot_robustness, 'Visible', 'Off')
 set(handles.GRAPH_graph1, 'Visible', 'Off')
@@ -85,7 +99,7 @@ set(handles.GRAPH_graph1, 'Visible', 'Off')
 % axis(handles.GRAPH_Toyota);
 % imshow('toyota.PNG')
 
-warning('TO DO : popup avec N valeurs au lieu de 10')
+disp('TO DO : popup avec N valeurs au lieu de 10')
 
 
 disp('')
@@ -121,7 +135,7 @@ function BUT_load_data_Callback(hObject, eventdata, handles)
 
 global DATA
 
-% disp('- TO DO : make code smarter')
+disp('- TO DO : make code smarter')
 data = DATA.Out_exp1 ;
 Out_exp1 = data ;
 
