@@ -57,34 +57,18 @@ disp('--------------------------------------------------------------------------
 disp(' Welcome ! ')
 disp('-------------------------------------------------------------------------------------')
 
-
-
-
-
-
-
-
-
 disp('Initialization : ')
 disp('')
-
 
 disp('- Adding to path all subfolders of the project')
 addPath()
 
-% this is just to test the code
-% % to be deleted until 'end deletion' 
-load Experience1
-global out          
-out = Out_exp1 ;
-% % end deletion
+global DATA
 
+name = fieldnames(DATA) ;
 
-
-% global DATA
 % disp('- Set Structure name (a modifier avec données d''Arvind)')
-% load example_allExperimentData.mat % To be deleted
-% set(handles.TXT_Name_data, 'String', fieldnames(DATA))
+set(handles.TXT_Name_data, 'String', name)
 
 % Hide panel
 % disp('- Hide panel')
@@ -93,13 +77,16 @@ set(handles.PANEL_Plot_robustness, 'Visible', 'Off')
 set(handles.GRAPH_graph1, 'Visible', 'Off')
 
 
+
+
+
 % axis(handles.GRAPH_Verimag);
 % imshow('verimag.PNG')
 % 
 % axis(handles.GRAPH_Toyota);
 % imshow('toyota.PNG')
 
-disp('TO DO : popup avec N valeurs au lieu de 10')
+% disp('TO DO : popup avec N valeurs au lieu de 10')
 
 
 disp('')
@@ -108,7 +95,6 @@ disp('--------------------------------------------------------------------------
 
 % Choose default command line output for GUI_interactive_graph
 handles.output = hObject;
-
 
 % Update handles structure
 guidata(hObject, handles);
@@ -133,18 +119,25 @@ function BUT_load_data_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+
+cla 
+
+
 global DATA
 
-disp('- TO DO : make code smarter')
-data = DATA.Out_exp1 ;
-Out_exp1 = data ;
-
+% disp('- TO DO : make code smarter')
+name_fields = fieldnames(DATA) ;
+valeurs = name_fields{handles.TXT_Name_data.Value} ;
+data = DATA.(valeurs) ;
 
 global OUT
-OUT = Out_exp1 ;
+OUT = data ;
 disp('-------------------------------------------------------------------------------------')
 disp('Data loaded')
 disp('-------------------------------------------------------------------------------------')
+
+set(handles.POPUP_rectangle, 'String', num2str((1:1:numel(OUT.regions))'));
+
 
 set(handles.PANEL_projection_dimension, 'Visible', 'On')
 
@@ -231,10 +224,14 @@ global OUT
 x = handles.POPUP_valueX.Value ;
 y = handles.POPUP_valueY.Value ;
 
+% Delete all texts on the graph
+allText = findobj(gca,'Type','Text') ;
+    delete(allText)
 cla %clear axes
 
 plot_rectangles(OUT, x, y)
 
+% Make a new part of the UI visible
 set(handles.GRAPH_graph1, 'Visible', 'On')
 set(handles.PANEL_Plot_robustness, 'Visible', 'On')
 
@@ -255,15 +252,47 @@ global OUT
 x = handles.POPUP_valueX.Value ;
 y = handles.POPUP_valueY.Value ;
 
-% call of the function to plot the x and y selected 
-% to have more detail tape 'help(interactive_graph)'
+% Recover the zone you want to plot
 column = handles.POPUP_rectangle.Value ; 
+
+cla % clear axes
+
+plot_rectangles_and_colore_selected_one(OUT, x, y, column)
+
+
+
+% call of the function to plot the x and y selected 
+% to have more detail tape 'help interactive_graph'
+
 interactive_graph(OUT, x, y, column)
 disp('Open interactive graph ')
 disp('Use left click on the points to get their robustness value and their position')
 disp('Use right click to delete all the texts on the figure')
 disp('-------------------------------------------------------------------------------------')
 
+
+% --- Executes on selection change in TXT_Name_data.
+function TXT_Name_data_Callback(hObject, eventdata, handles)
+% hObject    handle to TXT_Name_data (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns TXT_Name_data contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from TXT_Name_data
+
+
+
+% --- Executes during object creation, after setting all properties.
+function TXT_Name_data_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to TXT_Name_data (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
 
 
 

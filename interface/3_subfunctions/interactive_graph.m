@@ -37,6 +37,8 @@ scatter(x,y,[],c)
 xlabel(['Projection dimension ', num2str(COLONE1)])
 ylabel(['Projection dimension ', num2str(COLONE2)])
 
+title(['Points in rectangle ' num2str(COLUMN) ' for x = ' num2str(i) ', y = ' num2str(j) ])
+
 % add color bar
 colorbar('')
 
