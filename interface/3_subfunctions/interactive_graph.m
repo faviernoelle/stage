@@ -1,18 +1,11 @@
 function interactive_graph(Out, i, j, rectangle, varargin)
 
-% interactive_graph(Out, i, j, varargin)
-% a compléter
-% 
-% 
-% 
+% interactive_graph(Out, i, j,rectangle, varargin)
+% Open in a new window a graph with the points contained in the rectangle
+% choosen. Each point is coloured thanks to the value of its robustness.
+% i and j are the projection dimension selected 
+% Out is the structure contening the data to study. Must be a StatFalsify
 
-if nargin == 0
-  clear all
-end
-
-% fprintf(['--------------------\n', ...
-%   'B-spline Lab\nPress ''H'' for help.\n', ...
-%   '--------------------\n\n'])
 
 global COLONE1 COLONE2 VALUES COLUMN
 
@@ -84,7 +77,7 @@ if strcmpi(get(gcf,'SelectionType'), 'Normal')
 
 % set value epsilon such that if the mouse is to far away from the point do
 % nothin
-    PARAM.epsilon = 0.3 ;
+    PARAM.epsilon = 0.1 ;
     % for every point test the distance between the value X of the point
     % and the value X of the mouse and the same for Y and if both values
     % are smaller than epsilon write on the graph the robustness value of
@@ -92,8 +85,14 @@ if strcmpi(get(gcf,'SelectionType'), 'Normal')
     for l=1:length(VALUES.clusters{COLUMN}.pts)
         % test the difference between position of the point and position of
         % the mouse
-        if abs(POINTEUR_Y - VALUES.clusters{COLUMN}.pts(l,COLONE2))< PARAM.epsilon & ...
-                abs(POINTEUR_X - VALUES.clusters{COLUMN}.pts(l,COLONE1))< PARAM.epsilon
+        % Define a cercle of radius 0.1 arround the point such that if the 
+        % mouse is in this cercle the values of the point are written 
+        % otherwise  they are not written
+        if sqrt((POINTEUR_Y - VALUES.clusters{COLUMN}.pts(l,COLONE2))  * ...
+                (POINTEUR_Y - VALUES.clusters{COLUMN}.pts(l,COLONE2)) + ...
+                (POINTEUR_X - VALUES.clusters{COLUMN}.pts(l,COLONE1))  * ...
+                (POINTEUR_X - VALUES.clusters{COLUMN}.pts(l,COLONE1))) < PARAM.epsilon
+             
             
             % Part of the code to get the parameters to put the texts at the right position
             min = VALUES.regions{COLUMN}(COLONE2,1);
@@ -102,13 +101,16 @@ if strcmpi(get(gcf,'SelectionType'), 'Normal')
             delta = (max-min)*(PARAM.affich_text_robu) ;
 
             % Write robustness value on the graph, the first two values are
-            % used to define the position where you want to write the text
+            % used to define the position where the text will be written
+            % Writte robustness
             text(VALUES.clusters{COLUMN}.pts(l,COLONE1),...
                 VALUES.clusters{COLUMN}.pts(l,COLONE2), ...
             num2str(VALUES.clusters{COLUMN}.vals(l)))
+            % Writte position /x
             text(VALUES.clusters{COLUMN}.pts(l,COLONE1),...
                 VALUES.clusters{COLUMN}.pts(l,COLONE2)-delta, ...
                 ['x = ' num2str(VALUES.clusters{COLUMN}.pts(l,COLONE1))]); 
+            % Writte position /y
             text(VALUES.clusters{COLUMN}.pts(l,COLONE1),...
                 VALUES.clusters{COLUMN}.pts(l,COLONE2)-2*delta, ...    
                 ['y = ' num2str(VALUES.clusters{COLUMN}.pts(l,COLONE2))]);
@@ -132,9 +134,3 @@ disp('use of mouse scroll')
 function KeyPress(~,Event)
 % Not used for now
 disp('a key has been pressed')
-
-
-
-
-
-
