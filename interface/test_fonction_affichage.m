@@ -14,7 +14,7 @@ clc
 
 % load new_data
 
-load Data_to_test
+load donnees_nono
 
 
 global DATA

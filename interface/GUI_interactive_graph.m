@@ -22,7 +22,7 @@ function varargout = GUI_interactive_graph(varargin)
 
 % Edit the above text to modify the response to help GUI_interactive_graph
 
-% Last Modified by GUIDE v2.5 19-Jun-2017 11:50:54
+% Last Modified by GUIDE v2.5 23-Jun-2017 13:40:26
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -52,44 +52,42 @@ function GUI_interactive_graph_OpeningFcn(hObject, eventdata, handles, varargin)
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to GUI_interactive_graph (see VARARGIN)
 
+
 clc
+cla(handles.GRAPH_graph1) 
+
+% Informing the user
 disp('-------------------------------------------------------------------------------------')
 disp(' Welcome ! ')
 disp('-------------------------------------------------------------------------------------')
-
 disp('Initialization : ')
-disp('')
-
 disp('- Adding to path all subfolders of the project')
-addPath()
+addPath() % Adding to path all subfolders of the project
+
+% Set properties of objects
+disp('- Set properties of objects')
 
 global DATA
 
-name = fieldnames(DATA) ;
+% Getting the name of the differents data to post
+name_fields = fieldnames(DATA) ;
 
-% disp('- Set Structure name (a modifier avec données d''Arvind)')
-set(handles.TXT_Name_data, 'String', name)
+% Set Structure name
+set(handles.TXT_Name_data, 'String', name_fields)
 
 % Hide panel
-% disp('- Hide panel')
+disp('- Hide panel')
 set(handles.PANEL_projection_dimension, 'Visible', 'Off')
 set(handles.PANEL_Plot_robustness, 'Visible', 'Off')
 set(handles.GRAPH_graph1, 'Visible', 'Off')
 
+% Adding images
+disp('- Adding images')
+axes(handles.GRAPH_Verimag);
+imshow('verimag.PNG')
+axes(handles.GRAPH_Toyota);
+imshow('toyota.PNG')
 
-
-
-
-% axis(handles.GRAPH_Verimag);
-% imshow('verimag.PNG')
-% 
-% axis(handles.GRAPH_Toyota);
-% imshow('toyota.PNG')
-
-% disp('TO DO : popup avec N valeurs au lieu de 10')
-
-
-disp('')
 disp('End initialization')
 disp('-------------------------------------------------------------------------------------')
 
@@ -120,25 +118,26 @@ function BUT_load_data_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 
-cla 
+cla(handles.GRAPH_graph1) % clear graph on the right
 
 
 global DATA
 
-% disp('- TO DO : make code smarter')
 name_fields = fieldnames(DATA) ;
 valeurs = name_fields{handles.TXT_Name_data.Value} ;
-data = DATA.(valeurs) ;
 
-global OUT
-OUT = data ;
+
 disp('-------------------------------------------------------------------------------------')
 disp('Data loaded')
 disp('-------------------------------------------------------------------------------------')
 
-set(handles.POPUP_rectangle, 'String', num2str((1:1:numel(OUT.regions))'));
+set(handles.POPUP_rectangle, 'String', num2str((1:1:numel(DATA.(valeurs).regions))'));
 
+% Set the number of projection dimension possible 
+set(handles.POPUP_valueX, 'String', num2str((1:1:(numel(DATA.(valeurs).clusters{1}.pts(1,:))))')) ;
+set(handles.POPUP_valueY, 'String', num2str((1:1:(numel(DATA.(valeurs).clusters{1}.pts(1,:))))')) ;
 
+% Make a new part of the interface visible
 set(handles.PANEL_projection_dimension, 'Visible', 'On')
 
 
@@ -147,7 +146,6 @@ function POPUP_valueX_Callback(hObject, eventdata, handles)
 % hObject    handle to POPUP_valueX (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
 % Hints: contents = cellstr(get(hObject,'String')) returns POPUP_valueX contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from POPUP_valueX
 
@@ -170,7 +168,6 @@ function POPUP_valueY_Callback(hObject, eventdata, handles)
 % hObject    handle to POPUP_valueY (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
 % Hints: contents = cellstr(get(hObject,'String')) returns POPUP_valueY contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from POPUP_valueY
 
@@ -197,6 +194,30 @@ function POPUP_rectangle_Callback(hObject, eventdata, handles)
 % Hints: contents = cellstr(get(hObject,'String')) returns POPUP_rectangle contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from POPUP_rectangle
 
+cla(handles.GRAPH_graph1)  % clear axes
+
+global DATA
+
+% recover x and y you wnat to plot
+x = handles.POPUP_valueX.Value ;
+y = handles.POPUP_valueY.Value ;
+
+% Recover the zone you want to plot
+column = handles.POPUP_rectangle.Value ; 
+
+name_fields = fieldnames(DATA) ;
+valeurs = name_fields{handles.TXT_Name_data.Value} ;
+
+% Write the size of selected rectangle in the panel choose rectangle to
+% plot
+set(handles.TXT_size_rect_x, 'String',...
+    ['Size/x = ' num2str(DATA.(valeurs).regions{column}(x,:))])
+set(handles.TXT_size_rect_y, 'String',...
+    ['Size/y = ' num2str(DATA.(valeurs).regions{column}(y,:))])
+
+% Plot rectangle in the graph on the right and color the border of the
+% selected one and the points inside it
+plot_rectangles_and_colore_selected_one(DATA.(valeurs), x, y, column)
 
 % --- Executes during object creation, after setting all properties.
 function POPUP_rectangle_CreateFcn(hObject, eventdata, handles)
@@ -216,20 +237,38 @@ end
 % --- Executes on button press in BUT_plot_rectangles.
 function BUT_plot_rectangles_Callback(hObject, eventdata, handles)
 
-global OUT
+global DATA
 % hObject    handle to BUT_plot_rectangles (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
 x = handles.POPUP_valueX.Value ;
 y = handles.POPUP_valueY.Value ;
+column = handles.POPUP_rectangle.Value ; 
 
 % Delete all texts on the graph
 allText = findobj(gca,'Type','Text') ;
-    delete(allText)
-cla %clear axes
+delete(allText)
+ 
+cla(handles.GRAPH_graph1)  %clear axes
 
-plot_rectangles(OUT, x, y)
+% Get the name of the fields contained in DATA
+name_fields = fieldnames(DATA) ;
+valeurs = name_fields{handles.TXT_Name_data.Value} ;
+
+% Write the size of selected rectangle in the panel 'choose rectangle to
+% plot'
+set(handles.TXT_size_rect_x, 'String',...
+    ['Size/x = ' num2str(DATA.(valeurs).regions{column}(x,:))])
+set(handles.TXT_size_rect_y, 'String',...
+    ['Size/y = ' num2str(DATA.(valeurs).regions{column}(y,:))])
+
+
+% Plot in the graph on the left the rectangles in projection dimension
+% selected and color each point according to the value of its robustness
+% To have more details tape 'help plot_rectangles_and_colore_selected_one'
+axes(handles.GRAPH_graph1)
+plot_rectangles_and_colore_selected_one(DATA.(valeurs), x, y, column)
 
 % Make a new part of the UI visible
 set(handles.GRAPH_graph1, 'Visible', 'On')
@@ -246,7 +285,7 @@ function BUT_robustness_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-global OUT
+global DATA
 
 % recover x and y you wnat to plot
 x = handles.POPUP_valueX.Value ;
@@ -255,16 +294,14 @@ y = handles.POPUP_valueY.Value ;
 % Recover the zone you want to plot
 column = handles.POPUP_rectangle.Value ; 
 
-cla % clear axes
-
-plot_rectangles_and_colore_selected_one(OUT, x, y, column)
-
-
+% Get the name of the fields contained in DATA
+name_fields = fieldnames(DATA) ;
+valeurs = name_fields{handles.TXT_Name_data.Value} ;
 
 % call of the function to plot the x and y selected 
 % to have more detail tape 'help interactive_graph'
+interactive_graph(DATA.(valeurs), x, y, column)
 
-interactive_graph(OUT, x, y, column)
 disp('Open interactive graph ')
 disp('Use left click on the points to get their robustness value and their position')
 disp('Use right click to delete all the texts on the figure')
@@ -276,7 +313,6 @@ function TXT_Name_data_Callback(hObject, eventdata, handles)
 % hObject    handle to TXT_Name_data (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
 % Hints: contents = cellstr(get(hObject,'String')) returns TXT_Name_data contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from TXT_Name_data
 
@@ -318,12 +354,12 @@ function MENU_document_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_document (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-disp('- Open super word document of nono')
-
+disp('- Open PDF Document to learn how to use this interface')
+open 'User_guide.pdf'
 
 
 % --------------------------------------------------------------------
-function MENU_Menu_Callback(hObject, eventdata, handles)
+function MENU_Menu_Callback(hObject, ~, handles)
 % hObject    handle to MENU_Menu (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -334,7 +370,8 @@ function MENU_save_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_save (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-warning('TO DO')
+save all_handles handles
+disp('Save the current version of the interface')
 
 
 % --------------------------------------------------------------------
@@ -342,19 +379,5 @@ function MENU_load_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_load (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-warning('TO DO')
-
-
-
-% --------------------------------------------------------------------
-function blabla_Callback(hObject, eventdata, handles)
-% hObject    handle to blabla (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
-% --------------------------------------------------------------------
-function Untitled_2_Callback(hObject, eventdata, handles)
-% hObject    handle to Untitled_2 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+load all_handles
+disp('Load the last version of the interface')
