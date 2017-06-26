@@ -12,8 +12,10 @@ clear all
 close all
 clc 
 
-% load new_data
 
+
+% load new_data
+addpath(genpath('1_data'))
 load donnees_nono
 
 

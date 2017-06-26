@@ -22,7 +22,7 @@ function varargout = GUI_interactive_graph(varargin)
 
 % Edit the above text to modify the response to help GUI_interactive_graph
 
-% Last Modified by GUIDE v2.5 23-Jun-2017 13:40:26
+% Last Modified by GUIDE v2.5 26-Jun-2017 10:54:55
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -379,5 +379,29 @@ function MENU_load_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_load (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+disp('Load the last saved version of the interface')
 load all_handles
-disp('Load the last version of the interface')
+delete all_handles.mat
+
+
+% --------------------------------------------------------------------
+function MENU_open_Callback(hObject, eventdata, handles)
+% hObject    handle to MENU_open (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+disp('Writte the name of the file you want to load : (for instance fig1.fig) ')
+nameFig = input('', 's') ;
+open(nameFig)
+disp('Load selected version of the interface')
+
+
+% --------------------------------------------------------------------
+function MENU_saveas_Callback(hObject, eventdata, handles)
+% hObject    handle to MENU_saveas (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+disp('Save as')
+saveAs = input('', 's')
+saveas(handles.figure1,saveAs)
+disp(['fig saved in the file ' saveAs])
