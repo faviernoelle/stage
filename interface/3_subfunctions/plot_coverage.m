@@ -1,11 +1,12 @@
-function interactive_graph(Out, i, j, rectangle, varargin)
+function plot_coverage(Out, i, j, rectangle, varargin)
 
-% interactive_graph(Out, i, j,rectangle, varargin)
-% Open in a new window a graph with the points contained in the rectangle
-% choosen. Each point is coloured thanks to the value of its robustness.
-% i and j are the projection dimension selected 
-% Out is the structure contening the data to study. Must be a StatFalsify
-
+% plot_rectangles_and_colore_selected_one(out,i,j,col)
+% out = data to plot. Must be in a structure named DATA and the elements in
+% DATA must be statFalsify structures
+% i = values of dimension projection used on x
+% j = values of dimension projection used on y
+% col = rectangle selected. The points in this rectangle will be filled and
+% the edge of this rectangle will be coloured
 
 global COLONE1 COLONE2 VALUES COLUMN
 
@@ -47,7 +48,6 @@ set(H,'WindowButtonDownFcn',@MouseClick);
 set(H,'WindowScrollWheelFcn',@MouseScroll);
 set(H,'KeyPressFcn',@KeyPress ); 
 
-
 function MouseMove(~,~)
 
 % function which act when the mouse is being moved (get the current 
@@ -71,9 +71,6 @@ global POINTEUR_X POINTEUR_Y COLONE1 COLONE2 VALUES COLUMN
 
 % Left click
 if strcmpi(get(gcf,'SelectionType'), 'Normal')
-
-% set value epsilon such that if the mouse is to far away from the point do
-% nothin
     PARAM.epsilon = 0.1 ;
     % for every point test the distance between the value X of the point
     % and the value X of the mouse and the same for Y and if both values
@@ -89,40 +86,38 @@ if strcmpi(get(gcf,'SelectionType'), 'Normal')
                 (POINTEUR_Y - VALUES.clusters{COLUMN}.pts(l,COLONE2)) + ...
                 (POINTEUR_X - VALUES.clusters{COLUMN}.pts(l,COLONE1))  * ...
                 (POINTEUR_X - VALUES.clusters{COLUMN}.pts(l,COLONE1))) < PARAM.epsilon
-             
-            
-            % Part of the code to get the parameters to put the texts at the right position
-            min = VALUES.regions{COLUMN}(COLONE2,1);
-            max = VALUES.regions{COLUMN}(COLONE2,2);
-            PARAM.affich_text_robu = 1.5/40 ; % parameter calculed to optimize visualization
-            delta = (max-min)*(PARAM.affich_text_robu) ;
-
-            % Write robustness value on the graph, the first two values are
-            % used to define the position where the text will be written
-            % Writte robustness
-            text(VALUES.clusters{COLUMN}.pts(l,COLONE1),...
-                VALUES.clusters{COLUMN}.pts(l,COLONE2), ...
-            num2str(VALUES.clusters{COLUMN}.vals(l)))
-            % Writte position /x
-            text(VALUES.clusters{COLUMN}.pts(l,COLONE1),...
-                VALUES.clusters{COLUMN}.pts(l,COLONE2)-delta, ...
-                ['x = ' num2str(VALUES.clusters{COLUMN}.pts(l,COLONE1))]); 
-            % Writte position /y
-            text(VALUES.clusters{COLUMN}.pts(l,COLONE1),...
-                VALUES.clusters{COLUMN}.pts(l,COLONE2)-2*delta, ...    
-                ['y = ' num2str(VALUES.clusters{COLUMN}.pts(l,COLONE2))]);
-           
-        else
-            % Do nothing
+            disp('plot signal')
+        else 
+            %do nothing
         end
     end
-    
-% Right click
-elseif strcmpi(get(gcf,'SelectionType'), 'Alt')
-    allText = findobj(gca,'Type','Text') ;
-    delete(allText)
-end
 
+elseif strcmpi(get(gcf,'SelectionType'), 'Alt')
+    PARAM.epsilon = 0.1 ;
+    % for every point test the distance between the value X of the point
+    % and the value X of the mouse and the same for Y and if both values
+    % are smaller than epsilon write on the graph the robustness value of
+    % the point
+    for l=1:length(VALUES.clusters{COLUMN}.pts)
+        % test the difference between position of the point and position of
+        % the mouse
+        % Define a cercle of radius 0.1 arround the point such that if the 
+        % mouse is in this cercle the values of the point are written 
+        % otherwise  they are not written
+        if sqrt((POINTEUR_Y - VALUES.clusters{COLUMN}.pts(l,COLONE2))  * ...
+                (POINTEUR_Y - VALUES.clusters{COLUMN}.pts(l,COLONE2)) + ...
+                (POINTEUR_X - VALUES.clusters{COLUMN}.pts(l,COLONE1))  * ...
+                (POINTEUR_X - VALUES.clusters{COLUMN}.pts(l,COLONE1))) > PARAM.epsilon
+            if l == 1 
+                disp('plot new signal')
+            end
+        else
+            % Don nothing
+        end
+
+    
+    end
+end
 
 function MouseScroll(~,Event)
 % Not used for now
@@ -131,3 +126,5 @@ disp('use of mouse scroll')
 function KeyPress(~,Event)
 % Not used for now
 disp('a key has been pressed')
+
+

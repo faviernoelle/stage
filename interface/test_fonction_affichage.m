@@ -1,7 +1,7 @@
 %% Interactive graph 
 
 % Author : Noëlle FAVIER
-% 
+
 % Client : Santosh Arvind ADIMOOLAM
 
 % Script to test all the functions
@@ -12,11 +12,11 @@ clear all
 close all
 clc 
 
-
+%% Test of the functions
 
 % load new_data
 addpath(genpath('1_data'))
-load donnees_nono
+load Data_to_test
 
 
 global DATA

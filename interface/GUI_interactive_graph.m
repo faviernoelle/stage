@@ -22,7 +22,7 @@ function varargout = GUI_interactive_graph(varargin)
 
 % Edit the above text to modify the response to help GUI_interactive_graph
 
-% Last Modified by GUIDE v2.5 26-Jun-2017 10:54:55
+% Last Modified by GUIDE v2.5 27-Jun-2017 16:57:11
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -121,6 +121,8 @@ function BUT_load_data_Callback(hObject, eventdata, handles)
 cla(handles.GRAPH_graph1) % clear graph on the right
 
 
+
+
 global DATA
 
 name_fields = fieldnames(DATA) ;
@@ -136,6 +138,8 @@ set(handles.POPUP_rectangle, 'String', num2str((1:1:numel(DATA.(valeurs).regions
 % Set the number of projection dimension possible 
 set(handles.POPUP_valueX, 'String', num2str((1:1:(numel(DATA.(valeurs).clusters{1}.pts(1,:))))')) ;
 set(handles.POPUP_valueY, 'String', num2str((1:1:(numel(DATA.(valeurs).clusters{1}.pts(1,:))))')) ;
+
+set(handles.POPUP_valueY,'Value',2)
 
 % Make a new part of the interface visible
 set(handles.PANEL_projection_dimension, 'Visible', 'On')
@@ -308,6 +312,28 @@ disp('Use right click to delete all the texts on the figure')
 disp('-------------------------------------------------------------------------------------')
 
 
+% --- Executes on button press in BUT_plot_coverage.
+function BUT_plot_coverage_Callback(hObject, eventdata, handles)
+% hObject    handle to BUT_plot_coverage (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+global DATA
+
+% recover x and y you wnat to plot
+x = handles.POPUP_valueX.Value ;
+y = handles.POPUP_valueY.Value ;
+
+% Recover the zone you want to plot
+column = handles.POPUP_rectangle.Value ; 
+
+% Get the name of the fields contained in DATA
+name_fields = fieldnames(DATA) ;
+valeurs = name_fields{handles.TXT_Name_data.Value} ;
+
+plot_coverage(DATA.(valeurs), x, y, column)
+
+
 % --- Executes on selection change in TXT_Name_data.
 function TXT_Name_data_Callback(hObject, eventdata, handles)
 % hObject    handle to TXT_Name_data (see GCBO)
@@ -365,34 +391,21 @@ function MENU_Menu_Callback(hObject, ~, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 
-% --------------------------------------------------------------------
-function MENU_save_Callback(hObject, eventdata, handles)
-% hObject    handle to MENU_save (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-save all_handles handles
-disp('Save the current version of the interface')
-
-
-% --------------------------------------------------------------------
-function MENU_load_Callback(hObject, eventdata, handles)
-% hObject    handle to MENU_load (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-disp('Load the last saved version of the interface')
-load all_handles
-delete all_handles.mat
-
 
 % --------------------------------------------------------------------
 function MENU_open_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_open (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-disp('Writte the name of the file you want to load : (for instance fig1.fig) ')
-nameFig = input('', 's') ;
-open(nameFig)
-disp('Load selected version of the interface')
+[filename, Pathname] = uigetfile ;
+addpath(Pathname)
+open(filename)
+
+
+% disp('Writte the name of the file you want to load : (for instance fig1.fig) ')
+% nameFig = input('', 's') ;
+% open(nameFig)
+% disp('Open selected version of the interface')
 
 
 % --------------------------------------------------------------------
@@ -401,7 +414,12 @@ function MENU_saveas_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-disp('Save as')
-saveAs = input('', 's')
-saveas(handles.figure1,saveAs)
-disp(['fig saved in the file ' saveAs])
+% disp('Save as')
+[Filename, Pathname] = uiputfile({'*.fig';'*.jpg';'*.png';'*.*'},'Save as'); 
+bakCD = cd ; 
+cd(Pathname) ;
+saveas(handles.figure1,Filename)
+cd(bakCD) ;
+
+
+
