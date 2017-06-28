@@ -189,54 +189,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on selection change in POPUP_rectangle.
-function POPUP_rectangle_Callback(hObject, eventdata, handles)
-% hObject    handle to POPUP_rectangle (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: contents = cellstr(get(hObject,'String')) returns POPUP_rectangle contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from POPUP_rectangle
-
-cla(handles.GRAPH_graph1)  % clear axes
-
-global DATA
-
-% recover x and y you wnat to plot
-x = handles.POPUP_valueX.Value ;
-y = handles.POPUP_valueY.Value ;
-
-% Recover the zone you want to plot
-column = handles.POPUP_rectangle.Value ; 
-
-name_fields = fieldnames(DATA) ;
-valeurs = name_fields{handles.TXT_Name_data.Value} ;
-
-% Write the size of selected rectangle in the panel choose rectangle to
-% plot
-set(handles.TXT_size_rect_x, 'String',...
-    ['Size/x = ' num2str(DATA.(valeurs).regions{column}(x,:))])
-set(handles.TXT_size_rect_y, 'String',...
-    ['Size/y = ' num2str(DATA.(valeurs).regions{column}(y,:))])
-
-% Plot rectangle in the graph on the right and color the border of the
-% selected one and the points inside it
-plot_rectangles_and_colore_selected_one(DATA.(valeurs), x, y, column)
-
-% --- Executes during object creation, after setting all properties.
-function POPUP_rectangle_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to POPUP_rectangle (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-
 
 % --- Executes on button press in BUT_plot_rectangles.
 function BUT_plot_rectangles_Callback(hObject, eventdata, handles)
@@ -266,6 +218,8 @@ set(handles.TXT_size_rect_x, 'String',...
     ['Size/x = ' num2str(DATA.(valeurs).regions{column}(x,:))])
 set(handles.TXT_size_rect_y, 'String',...
     ['Size/y = ' num2str(DATA.(valeurs).regions{column}(y,:))])
+set(handles.TXT_coverage, 'String',...
+    ['local coverage = ' num2str(DATA.(valeurs).coverage(column))])
 
 
 % Plot in the graph on the left the rectangles in projection dimension
@@ -281,6 +235,60 @@ set(handles.PANEL_Plot_robustness, 'Visible', 'On')
 
 disp('Plot rectangles')
 disp('-------------------------------------------------------------------------------------')
+
+
+
+
+% --- Executes on selection change in POPUP_rectangle.
+function POPUP_rectangle_Callback(hObject, eventdata, handles)
+% hObject    handle to POPUP_rectangle (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns POPUP_rectangle contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from POPUP_rectangle
+
+cla(handles.GRAPH_graph1)  % clear axes
+
+global DATA
+
+% recover x and y you wnat to plot
+x = handles.POPUP_valueX.Value ;
+y = handles.POPUP_valueY.Value ;
+
+% Recover the zone you want to plot
+column = handles.POPUP_rectangle.Value ; 
+
+name_fields = fieldnames(DATA) ;
+valeurs = name_fields{handles.TXT_Name_data.Value} ;
+
+% Write the size of selected rectangle and its coverage value in the panel 
+% choose rectangle to plot
+set(handles.TXT_size_rect_x, 'String',...
+    ['Size/x = ' num2str(DATA.(valeurs).regions{column}(x,:))])
+set(handles.TXT_size_rect_y, 'String',...
+    ['Size/y = ' num2str(DATA.(valeurs).regions{column}(y,:))])
+set(handles.TXT_coverage, 'String',...
+    ['local coverage = ' num2str(DATA.(valeurs).coverage(column))])
+
+% Plot rectangle in the graph on the right and color the border of the
+% selected one and the points inside it
+plot_rectangles_and_colore_selected_one(DATA.(valeurs), x, y, column)
+
+
+
+% --- Executes during object creation, after setting all properties.
+function POPUP_rectangle_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to POPUP_rectangle (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
 
 
 % --- Executes on button press in BUT_robustness.
