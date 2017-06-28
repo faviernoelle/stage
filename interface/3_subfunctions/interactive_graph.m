@@ -3,8 +3,12 @@ function interactive_graph(Out, i, j, rectangle, varargin)
 % interactive_graph(Out, i, j,rectangle, varargin)
 % Open in a new window a graph with the points contained in the rectangle
 % choosen. Each point is coloured thanks to the value of its robustness.
+%
 % i and j are the projection dimension selected 
 % Out is the structure contening the data to study. Must be a StatFalsify
+% rectangle correpond to the selected rectangle 
+% Explanation of the parameters retangle with the structure StatFalsify : 
+% Out.clusters{rectangle, rectangle}.pts
 
 
 global COLONE1 COLONE2 VALUES COLUMN
@@ -74,7 +78,12 @@ if strcmpi(get(gcf,'SelectionType'), 'Normal')
 
 % set value epsilon such that if the mouse is to far away from the point do
 % nothin
-    PARAM.epsilon = 0.1 ;
+    PARAM.epsilon = 0.5 ;
+    
+    actual_fewest_dist = 1 ;
+    
+    line = 0 ; 
+    
     % for every point test the distance between the value X of the point
     % and the value X of the mouse and the same for Y and if both values
     % are smaller than epsilon write on the graph the robustness value of
@@ -82,14 +91,22 @@ if strcmpi(get(gcf,'SelectionType'), 'Normal')
     for l=1:length(VALUES.clusters{COLUMN}.pts)
         % test the difference between position of the point and position of
         % the mouse
-        % Define a cercle of radius 0.1 arround the point such that if the 
+        % Define a cercle of radius epsilon arround the point such that if the 
         % mouse is in this cercle the values of the point are written 
-        % otherwise  they are not written
-        if sqrt((POINTEUR_Y - VALUES.clusters{COLUMN}.pts(l,COLONE2))  * ...
+        % otherwise they are not written
+        dist =  (POINTEUR_Y - VALUES.clusters{COLUMN}.pts(l,COLONE2)) * ...
                 (POINTEUR_Y - VALUES.clusters{COLUMN}.pts(l,COLONE2)) + ...
-                (POINTEUR_X - VALUES.clusters{COLUMN}.pts(l,COLONE1))  * ...
-                (POINTEUR_X - VALUES.clusters{COLUMN}.pts(l,COLONE1))) < PARAM.epsilon
+                (POINTEUR_X - VALUES.clusters{COLUMN}.pts(l,COLONE1)) * ...
+                (POINTEUR_X - VALUES.clusters{COLUMN}.pts(l,COLONE1)) ;
+        
+        
+        if sqrt(dist) < PARAM.epsilon
              
+            if dist < actual_fewest_dist
+                actual_fewest_dist = dist ; 
+                line = l ; 
+            end
+            
             
             % Part of the code to get the parameters to put the texts at the right position
             min = VALUES.regions{COLUMN}(COLONE2,1);
@@ -97,24 +114,28 @@ if strcmpi(get(gcf,'SelectionType'), 'Normal')
             PARAM.affich_text_robu = 1.5/40 ; % parameter calculed to optimize visualization
             delta = (max-min)*(PARAM.affich_text_robu) ;
 
-            % Write robustness value on the graph, the first two values are
-            % used to define the position where the text will be written
-            % Writte robustness
-            text(VALUES.clusters{COLUMN}.pts(l,COLONE1),...
-                VALUES.clusters{COLUMN}.pts(l,COLONE2), ...
-            num2str(VALUES.clusters{COLUMN}.vals(l)))
-            % Writte position /x
-            text(VALUES.clusters{COLUMN}.pts(l,COLONE1),...
-                VALUES.clusters{COLUMN}.pts(l,COLONE2)-delta, ...
-                ['x = ' num2str(VALUES.clusters{COLUMN}.pts(l,COLONE1))]); 
-            % Writte position /y
-            text(VALUES.clusters{COLUMN}.pts(l,COLONE1),...
-                VALUES.clusters{COLUMN}.pts(l,COLONE2)-2*delta, ...    
-                ['y = ' num2str(VALUES.clusters{COLUMN}.pts(l,COLONE2))]);
-           
         else
             % Do nothing
         end
+    end
+    
+    if line ~= 0
+        % Write robustness value on the graph, the first two values are
+        % used to define the position where the text will be written
+        % Writte robustness
+        text(VALUES.clusters{COLUMN}.pts(line,COLONE1),...
+            VALUES.clusters{COLUMN}.pts(line,COLONE2), ...
+        num2str(VALUES.clusters{COLUMN}.vals(line)))
+        % Writte position /x
+        text(VALUES.clusters{COLUMN}.pts(line,COLONE1),...
+            VALUES.clusters{COLUMN}.pts(line,COLONE2)-delta, ...
+            ['x = ' num2str(VALUES.clusters{COLUMN}.pts(line,COLONE1))]); 
+        % Writte position /y
+        text(VALUES.clusters{COLUMN}.pts(line,COLONE1),...
+            VALUES.clusters{COLUMN}.pts(line,COLONE2)-2*delta, ...    
+            ['y = ' num2str(VALUES.clusters{COLUMN}.pts(line,COLONE2))]);
+    else 
+        % Do nothing
     end
     
 % Right click

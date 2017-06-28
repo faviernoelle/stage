@@ -14,9 +14,11 @@ clc
 
 %% Test of the functions
 
+addPath
+
 % load new_data
 addpath(genpath('1_data'))
-load Data_to_test
+load donnees_nono
 
 
 global DATA
@@ -38,3 +40,5 @@ GUI_interactive_graph
 
 % plot_rectangles_and_colore_selected_one(DATA.Exp3, 1, 5, 5)
 
+
+% plot_coverage(DATA.Exp1, 1, 2, 1)

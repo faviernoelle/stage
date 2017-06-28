@@ -22,7 +22,7 @@ function varargout = GUI_interactive_graph(varargin)
 
 % Edit the above text to modify the response to help GUI_interactive_graph
 
-% Last Modified by GUIDE v2.5 27-Jun-2017 16:57:11
+% Last Modified by GUIDE v2.5 28-Jun-2017 11:26:14
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -312,9 +312,9 @@ disp('Use right click to delete all the texts on the figure')
 disp('-------------------------------------------------------------------------------------')
 
 
-% --- Executes on button press in BUT_plot_coverage.
-function BUT_plot_coverage_Callback(hObject, eventdata, handles)
-% hObject    handle to BUT_plot_coverage (see GCBO)
+% --- Executes on button press in BUT_plot_signal.
+function BUT_plot_signal_Callback(hObject, eventdata, handles)
+% hObject    handle to BUT_plot_signal (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
@@ -331,7 +331,7 @@ column = handles.POPUP_rectangle.Value ;
 name_fields = fieldnames(DATA) ;
 valeurs = name_fields{handles.TXT_Name_data.Value} ;
 
-plot_coverage(DATA.(valeurs), x, y, column)
+plot_signal(DATA.(valeurs), x, y, column)
 
 
 % --- Executes on selection change in TXT_Name_data.
@@ -420,6 +420,3 @@ bakCD = cd ;
 cd(Pathname) ;
 saveas(handles.figure1,Filename)
 cd(bakCD) ;
-
-
-
