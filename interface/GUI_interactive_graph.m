@@ -22,7 +22,7 @@ function varargout = GUI_interactive_graph(varargin)
 
 % Edit the above text to modify the response to help GUI_interactive_graph
 
-% Last Modified by GUIDE v2.5 28-Jun-2017 11:26:14
+% Last Modified by GUIDE v2.5 29-Jun-2017 10:33:47
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -135,20 +135,53 @@ disp('--------------------------------------------------------------------------
 set(handles.POPUP_rectangle, 'String', num2str((1:1:numel(DATA.(valeurs).regions))'));
 
 % Set the number of projection dimension possible 
-set(handles.POPUP_valueX, 'String', num2str((1:1:(numel(DATA.(valeurs).clusters{1}.pts(1,:))))')) ;
-set(handles.POPUP_valueY, 'String', num2str((1:1:(numel(DATA.(valeurs).clusters{1}.pts(1,:))))')) ;
+set(handles.SLID_Pi, 'Min', 1) ;
+set(handles.SLID_Pi, 'Max', numel(DATA.(valeurs).clusters{1}.pts(1,:))) ;
+set(handles.SLID_Pj, 'Min', 1) ;
+set(handles.SLID_Pj, 'Max', numel(DATA.(valeurs).clusters{1}.pts(1,:))) ;
+
+
+
+% Set value of x to 1
+set(handles.SLID_Pi, 'Value', 1) ;
 
 % Set the value of y on 2 to be able to plot things without changing
 % anything
-set(handles.POPUP_valueY,'Value',2)
+set(handles.SLID_Pj, 'Value', 2) ;
 
-% Compute global coverage value
+
+
+% Writte on the text box under the slider the min, max and current values 
+% of the slider for Pi value
+set(handles.TXT_Pi_min,   'String', num2str(1)) ;
+set(handles.TXT_Pi_max,   'String', num2str(numel(DATA.(valeurs).clusters{1}.pts(1,:)))) ;
+set(handles.TXT_Pi_value, 'String', num2str(handles.SLID_Pi.Value(1))) ;
+
+% Writte on the text box under the slider the min, max and current values 
+% of the slider for Pj value
+set(handles.TXT_Pj_min,   'String', num2str(1)) ;
+set(handles.TXT_Pj_max,   'String', num2str(numel(DATA.(valeurs).clusters{1}.pts(1,:)))) ;
+set(handles.TXT_Pj_value, 'String', num2str(handles.SLID_Pj.Value(1))) ;
+
+
+% Select data to set intervale of the sliders
+sliderMin = get(handles.SLID_Pi, 'Min') ;
+sliderMax = get(handles.SLID_Pi, 'Max') ;
+SliderStep = [1 1] / (sliderMax - sliderMin) ;
+
+% Set interval of the slider for Pi and for Pj
+% Each time the user presses an arrow key or clicks in the troug the value
+% of the slidbar is increased of 1
+set(handles.SLID_Pi, 'SliderStep', SliderStep)  ;
+set(handles.SLID_Pj, 'SliderStep', SliderStep)  ;
+
+
+% Compute global coverage value (call function compute_global_coverage)
+% See help compute_global_coverage to get more details
 coverage = compute_global_coverage(DATA.(valeurs)) ;
-
 
 % Disp value of coverage in the panel 
 set(handles.TXT_global_coverage, 'String', coverage)
-
 
 
 % Make a new part of the interface visible
@@ -202,6 +235,59 @@ end
 
 
 
+% --- Executes on slider movement.
+function SLID_Pi_Callback(hObject, eventdata, handles)
+% hObject    handle to SLID_Pi (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'Value') returns position of slider
+%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+
+global DATA
+
+set(handles.TXT_Pi_value, 'String', num2str(floor(handles.SLID_Pi.Value(1)))) ;
+
+
+% --- Executes during object creation, after setting all properties.
+function SLID_Pi_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to SLID_Pi (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: slider controls usually have a light gray background.
+if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor',[.9 .9 .9]);
+end
+
+
+
+% --- Executes on slider movement.
+function SLID_Pj_Callback(hObject, eventdata, handles)
+% hObject    handle to SLID_Pj (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'Value') returns position of slider
+%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+
+set(handles.TXT_Pj_value, 'String', num2str(floor(handles.SLID_Pj.Value(1)))) ;
+
+
+
+% --- Executes during object creation, after setting all properties.
+function SLID_Pj_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to SLID_Pj (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: slider controls usually have a light gray background.
+if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor',[.9 .9 .9]);
+end
+
+
+
 % --- Executes on button press in BUT_plot_rectangles.
 function BUT_plot_rectangles_Callback(hObject, eventdata, handles)
 
@@ -210,8 +296,22 @@ global DATA
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-x = handles.POPUP_valueX.Value ;
-y = handles.POPUP_valueY.Value ;
+x = floor(handles.SLID_Pi.Value) ;
+y = floor(handles.SLID_Pj.Value) ;
+
+% Get the name of the fields contained in DATA
+name_fields = fieldnames(DATA) ;
+valeurs = name_fields{handles.TXT_Name_data.Value} ;
+
+
+
+% Get rectangle containing the point of minimal robustness
+region = get_min_rob(DATA.(valeurs)) ;
+
+% Select the rectangle containing the point with the lowest robustness
+set(handles.POPUP_rectangle, 'Value', region)
+
+% get the value of the pop_up to choose the rectangle
 column = handles.POPUP_rectangle.Value ; 
 
 % Delete all texts on the graph
@@ -220,9 +320,7 @@ delete(allText)
  
 cla(handles.GRAPH_graph1)  %clear axes
 
-% Get the name of the fields contained in DATA
-name_fields = fieldnames(DATA) ;
-valeurs = name_fields{handles.TXT_Name_data.Value} ;
+
 
 % Write the size of selected rectangle in the panel 'choose rectangle to
 % plot'
@@ -265,8 +363,8 @@ cla(handles.GRAPH_graph1)  % clear axes
 global DATA
 
 % recover x and y you wnat to plot
-x = handles.POPUP_valueX.Value ;
-y = handles.POPUP_valueY.Value ;
+x = floor(handles.SLID_Pi.Value) ;
+y = floor(handles.SLID_Pj.Value) ;
 
 % Recover the zone you want to plot
 column = handles.POPUP_rectangle.Value ; 
@@ -312,8 +410,8 @@ function BUT_robustness_Callback(hObject, eventdata, handles)
 global DATA
 
 % recover x and y you wnat to plot
-x = handles.POPUP_valueX.Value ;
-y = handles.POPUP_valueY.Value ;
+x = floor(handles.SLID_Pi.Value) ;
+y = floor(handles.SLID_Pj.Value) ;
 
 % Recover the zone you want to plot
 column = handles.POPUP_rectangle.Value ; 
@@ -341,8 +439,8 @@ function BUT_plot_signal_Callback(hObject, eventdata, handles)
 global DATA
 
 % recover x and y you wnat to plot
-x = handles.POPUP_valueX.Value ;
-y = handles.POPUP_valueY.Value ;
+x = floor(handles.SLID_Pi.Value) ;
+y = floor(handles.SLID_Pj.Value) ;
 
 % Recover the zone you want to plot
 column = handles.POPUP_rectangle.Value ; 
