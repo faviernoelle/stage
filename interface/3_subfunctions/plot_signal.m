@@ -67,7 +67,7 @@ function MouseClick(~,~)
     % if it's not on a point -> do nothing
 % click gauche clear texts on the figure
     
-global POINTEUR_X POINTEUR_Y COLONE1 COLONE2 VALUES COLUMN
+global POINTEUR_X POINTEUR_Y COLONE1 COLONE2 VALUES COLUMN CONSIGNE Y_PLOT
 
 % Left click
 if strcmpi(get(gcf,'SelectionType'), 'Normal')
@@ -109,18 +109,21 @@ if strcmpi(get(gcf,'SelectionType'), 'Normal')
     end
     
         if line ~= 0
+            
+            
+            
              u_x = VALUES.clusters{COLUMN}.pts(line,:) ;
-             figure()
-             x = [1:numel(u_x) ; 2:numel(u_x)+1] ;
-             u_x_plot = repmat(u_x,2,1) ; 
-             plot(x, u_x_plot, 'b-')
+             CONSIGNE = [0:numel(u_x)-1 ; 1:numel(u_x)] ;
+             Y_PLOT = repmat(u_x,2,1) ; 
+%              plot(CONSIGNE, Y_PLOT, 'b-')
+             GUI_plot_signal
         else 
             % Do nothing
         end
 
           
 
-
+% Right clik
 elseif strcmpi(get(gcf,'SelectionType'), 'Alt')
     PARAM.epsilon = 0.5 ;
     % for every point test the distance between the value X of the point
@@ -133,17 +136,33 @@ elseif strcmpi(get(gcf,'SelectionType'), 'Alt')
         % Define a cercle of radius epsilon arround the point such that if the 
         % mouse is in this cercle the values of the point are written 
         % otherwise  they are not written
-        if sqrt((POINTEUR_Y - VALUES.clusters{COLUMN}.pts(l,COLONE2))  * ...
-                (POINTEUR_Y - VALUES.clusters{COLUMN}.pts(l,COLONE2)) + ...
-                (POINTEUR_X - VALUES.clusters{COLUMN}.pts(l,COLONE1))  * ...
-                (POINTEUR_X - VALUES.clusters{COLUMN}.pts(l,COLONE1))) > PARAM.epsilon
-            if l == 1 
-                disp('plot new signal')
+        dist = (POINTEUR_Y - VALUES.clusters{COLUMN}.pts(l,COLONE2)) * ...
+               (POINTEUR_Y - VALUES.clusters{COLUMN}.pts(l,COLONE2)) + ...
+               (POINTEUR_X - VALUES.clusters{COLUMN}.pts(l,COLONE1)) * ...
+               (POINTEUR_X - VALUES.clusters{COLUMN}.pts(l,COLONE1)) ;
+        
+        
+        
+        if sqrt(dist) > PARAM.epsilon
+            
+            
+            
+            if l == length(VALUES.clusters{COLUMN}.pts)
+                Y_PLOT = repmat(round(rand(1,numel(VALUES.clusters{COLUMN}.pts(l,:)))*40),2,1) ;
+                CONSIGNE = [0:numel(VALUES.clusters{COLUMN}.pts(l,:))-1 ; 1:numel(VALUES.clusters{COLUMN}.pts(l,:))];
+                for i=1:numel(VALUES.clusters{COLUMN}.pts(l,:))
+                    
+                    Y_PLOT(:,COLONE1) = POINTEUR_X ;
+                    Y_PLOT(:,COLONE2) = POINTEUR_Y ;
+                end
+                
+%                   plot(CONSIGNE, Y_PLOT, 'b-')
+                    GUI_plot_signal
                 
             end
             
-             
-             
+            
+
         else
             % Don nothing
         end

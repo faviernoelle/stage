@@ -62,7 +62,7 @@ disp(' Welcome ! ')
 disp('-------------------------------------------------------------------------------------')
 disp('Initialization : ')
 disp('- Adding to path all subfolders of the project')
-addPath() % Adding to path all subfolders of the project
+% addPath() % Adding to path all subfolders of the project
 
 % Set properties of objects
 disp('- Set properties of objects')
@@ -80,6 +80,8 @@ disp('- Hide panel')
 set(handles.PANEL_projection_dimension, 'Visible', 'Off')
 set(handles.PANEL_Plot_robustness, 'Visible', 'Off')
 set(handles.GRAPH_graph1, 'Visible', 'Off')
+set(handles.GRAPH_coverage,'Visible', 'Off')
+set(handles.PANEL_coverage, 'Visible', 'Off')
 
 % Adding images
 disp('- Adding images')
@@ -121,13 +123,10 @@ function BUT_load_data_Callback(hObject, eventdata, handles)
 cla(handles.GRAPH_graph1) % clear graph on the right
 
 
-
-
 global DATA
 
 name_fields = fieldnames(DATA) ;
 valeurs = name_fields{handles.TXT_Name_data.Value} ;
-
 
 disp('-------------------------------------------------------------------------------------')
 disp('Data loaded')
@@ -139,10 +138,23 @@ set(handles.POPUP_rectangle, 'String', num2str((1:1:numel(DATA.(valeurs).regions
 set(handles.POPUP_valueX, 'String', num2str((1:1:(numel(DATA.(valeurs).clusters{1}.pts(1,:))))')) ;
 set(handles.POPUP_valueY, 'String', num2str((1:1:(numel(DATA.(valeurs).clusters{1}.pts(1,:))))')) ;
 
+% Set the value of y on 2 to be able to plot things without changing
+% anything
 set(handles.POPUP_valueY,'Value',2)
+
+% Compute global coverage value
+coverage = compute_global_coverage(DATA.(valeurs)) ;
+
+
+% Disp value of coverage in the panel 
+set(handles.TXT_global_coverage, 'String', coverage)
+
+
 
 % Make a new part of the interface visible
 set(handles.PANEL_projection_dimension, 'Visible', 'On')
+set(handles.GRAPH_coverage,'Visible', 'On')
+set(handles.PANEL_coverage, 'Visible', 'On')
 
 
 % --- Executes on selection change in POPUP_valueX.
