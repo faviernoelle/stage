@@ -27,13 +27,13 @@ global DATA
 % interactive_graph(DATA.Exp1, 1, 2, 1)
 
 
-% GUI_interactive_graph
+GUI_interactive_graph
 
 
 % plot_rectangles_and_colore_selected_one(DATA.Exp3, 1, 5, 5)
 
 
-plot_signal(DATA.Exp2, 1, 2, 1)
+% plot_signal(DATA.Exp2, 1, 2, 1)
 
 
 % coverage = compute_global_coverage(DATA.Exp1) ;

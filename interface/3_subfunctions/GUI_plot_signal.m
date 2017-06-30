@@ -52,14 +52,34 @@ function GUI_plot_signal_OpeningFcn(hObject, eventdata, handles, varargin)
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to GUI_plot_signal (see VARARGIN)
 
+
+% Global variable to plot
 global CONSIGNE X_PLOT 
 
+% Global variable to know the parameters of the signal
+global VALUES COLUMN LINE 
+
+% Global variable to know if the click was a right point not on a point or
+% a left click on a point
+global POINT_SELECTED
 
 
+% Graph : signal = consigne
 axes(handles.GRAPH_signal)
-% plot(X_PLOT, CONSIGNE, 'b-')
 stairs(X_PLOT, CONSIGNE)
 axis([0 length(CONSIGNE(1,:))-1 0 40])
+
+
+if POINT_SELECTED == 1
+    % the click was a left click on a point
+    set(handles.TXT_robu_value,'String',num2str(VALUES.clusters{COLUMN}.vals(LINE)))
+else 
+    % the point was a right click not on a point
+    set(handles.TXT_robu_value,'String',num2str(0))
+    disp('calcul of robustness of the new signal')
+end
+
+
 
 % Choose default command line output for GUI_plot_signal
 handles.output = hObject;
@@ -90,3 +110,4 @@ function BUT_test_Callback(hObject, eventdata, handles)
 % hObject    handle to BUT_test (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+disp('button pushed')

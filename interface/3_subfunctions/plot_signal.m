@@ -1,6 +1,6 @@
 function plot_signal(Out, i, j, rectangle, varargin)
 
-% plot_signal(out,i,j,col)
+% plot_signal(out,i,j,rectangle, varargin)
 % When rigth click on a point plot the signal corresponding to that point
 % When  left click on a place where there is no point, create and plot a
 % new signal
@@ -8,8 +8,9 @@ function plot_signal(Out, i, j, rectangle, varargin)
 % DATA must be statFalsify structures
 % i = values of dimension projection used on x
 % j = values of dimension projection used on y
-% rectangle = rectangle selected. The points in this rectangle will be 
-% filled and the edge of this rectangle will be coloured
+% rectangle = rectangle selected. 
+% Out.clusters{rectangles}.pts(:,i) gives us x on the graph
+% Out.clusters{rectangles}.pts(:,j) gives us y on the graph
 
 global COLONE1 COLONE2 VALUES COLUMN
 
@@ -62,26 +63,53 @@ POINTEUR_Y=CurrentPoint(2,2);
 function MouseClick(~,~)
 
 % function which act when the click is used :
-% When we do a left click in every case disp (left click) and
-    % if it's on a point -> plot robustness value
+% When the user do a left click
+    % if it's on a point -> open plot signal
     % if it's not on a point -> do nothing
-% click gauche clear texts on the figure
+% When the user do a right click
+    % if it's on a point -> do nothing
+    % if it's not on a point -> create and plot a new signal with values
+    % near the values of the signal with the lowest robustness except for
+    % the dimension i and j the values of the signal are the values of the
+    % position of the mouse
     
-global POINTEUR_X POINTEUR_Y COLONE1 COLONE2 VALUES COLUMN CONSIGNE X_PLOT
+    
+% global variable to determine if the plot will be a new signal or an 
+% existing signal = becomes 1 if the click was a left click on a point,
+% becomes 0 if the point was a rigth click not on a point
+global POINT_SELECTED
+    
+% global variables to get the current position of the mouse
+global POINTEUR_X POINTEUR_Y 
+
+% global variables to know the parameters of the data 
+global COLONE1 COLONE2 VALUES COLUMN 
+
+% global variables that will be plot in the GUI_plot_signal
+global CONSIGNE X_PLOT
 
 % Left click
 if strcmpi(get(gcf,'SelectionType'), 'Normal')
     PARAM.epsilon = 0.5 ;
     
+    % 
     actual_fewest_dist = 1 ; 
     
-    line = 0 ;
+    
+    % global variable to test if a point has been found and to get the line
+    % to plot the signal corresponding to the point
+    global LINE
     
     
-    % for every point test the distance between the value X of the point
-    % and the value X of the mouse and the same for Y and if both values
-    % are smaller than epsilon call the interface GUI_plot_signal that plot
-    % the signal (to get more detail tape 'help_GUI_plot_signal'
+    
+    LINE = 0 ;
+    POINT_SELECTED = 0 ;
+    
+    
+    % for every point compute the addition of the square of the distance 
+    % between the value X of the point and the value X of the mouse and the 
+    % same for Y and if both values are smaller than epsilon call the 
+    % interface GUI_plot_signal that plot the signal
     for l=1:length(VALUES.clusters{COLUMN}.pts)
         % test the difference between position of the point and position of
         % the mouse
@@ -95,41 +123,55 @@ if strcmpi(get(gcf,'SelectionType'), 'Normal')
                (POINTEUR_X - VALUES.clusters{COLUMN}.pts(l,COLONE1)) ;
         
         % Load the lowest value of distance to get exactly the good point
-        % (this means that if two points are near select only the nearest 
-        % point of the mouse) 
+        % (this means that if two points are near thanks to these line only
+        % the nearest point to the mouse will be selected) 
+        % Load also the value of the line to be able to plot the signal
+        % corresponding to the value
+        
+        % Test to determine if the click was on a point
         if sqrt(dist) < PARAM.epsilon
+            
+            
+            % if the click was on a point, test to determine which point is
+            % the nearest to the position of the mouse when the click happened 
             if dist < actual_fewest_dist
                 actual_fewest_dist = dist ; 
-                line = l ; 
+                LINE = l ;
+                POINT_SELECTED = 1 ;
             end 
         else 
             %do nothing
         end
     end
     
-        if line ~= 0
-             u_x = VALUES.clusters{COLUMN}.pts(line,:) ; % get the value to plot
+        if LINE ~= 0
+             u_x = VALUES.clusters{COLUMN}.pts(LINE,:) ; % get the value to plot
              
              
-             % axis x will be values from 1 to dimension number + 1
+             % axis x will be values from 0 to dimension number
              X_PLOT = 0:numel(u_x) ; 
              
-             %necessary to plot a constant piecewise function
-              CONSIGNE = [u_x u_x(end)] ; 
+             % signal to plot = values of the signal and last value of this
+             % signal to have asignal complete from 0 to 10 
+             CONSIGNE = [u_x u_x(end)] ; 
              
              % call the function to plot the signal and its robustness 
              % value and to be able to test this signal in simulation 
              GUI_plot_signal
+        
         else 
             % Do nothing
         end
 
-          
-
+        
 % Right clik
-elseif strcmpi(get(gcf,'SelectionType'), 'Alt')
+elseif strcmpi(get(gcf,'SelectionType'), 'Alt') 
+    
     PARAM.epsilon = 0.5 ;
     
+    
+    % variable used to test if the click was on a point or not so to know
+    % if a signal will be plot or not (tracer = plot in french)
     tracer = 1 ; 
     
     % for every point test the distance between the value X of the point
@@ -152,20 +194,39 @@ elseif strcmpi(get(gcf,'SelectionType'), 'Alt')
         if sqrt(dist) < PARAM.epsilon
             % If the distance between the point where the mouse was during
             % the click is smaller than epsilon it means that the mouse was
-            % on a point so tracer becomes 0 and the plot will not happens
+            % on a point so 'tracer' becomes 0 and the plot will not happens
             tracer = 0 ;   
 
         else
-            % Don nothing                      
+            % Do nothing                      
         end    
     end
     
     
     if tracer == 1        
         
-        % Create new points randomly
-        CONSIGNE = round(rand(1,numel(VALUES.clusters{COLUMN}.pts(l,:))+1)*40) ;
         
+        %
+        
+        % Create new points randomly
+%         CONSIGNE = round(rand(1,numel(VALUES.clusters{COLUMN}.pts(l,:))+1)*40) ;
+        
+
+        % Create new points near the points of the signal with the lowest
+        % robustness value
+        [region, line, ~] = get_min_rob(VALUES) ;
+        
+        % Selectionne the signal with the lowest robustesse of all signals 
+        % and modify it a ligttle 
+        signal = VALUES.clusters{region}.pts(line,:) ; 
+        signal_mod = signal + 0.01 * signal ; % To be improved 
+        
+        
+        % signal to plot = values of the signal and last value of this
+        % signal to have asignal complete from 0 to 10 
+        CONSIGNE = [signal_mod signal_mod(end)] ; 
+
+
         % axis x will be values from 1 to dimension + 1
         X_PLOT = 0:numel(VALUES.clusters{COLUMN}.pts(l,:)) ;         
         % The position of the mouse will determine two points in the graph
@@ -175,6 +236,9 @@ elseif strcmpi(get(gcf,'SelectionType'), 'Alt')
             CONSIGNE(:,COLONE2) = POINTEUR_Y ;
         end
 
+        
+        POINT_SELECTED = 0 ;
+        
         % call the function to plot the signal and its robustness 
         % value and to be able to test this signal in simulation 
         GUI_plot_signal

@@ -190,51 +190,6 @@ set(handles.GRAPH_coverage,'Visible', 'On')
 set(handles.PANEL_coverage, 'Visible', 'On')
 
 
-% --- Executes on selection change in POPUP_valueX.
-function POPUP_valueX_Callback(hObject, eventdata, handles)
-% hObject    handle to POPUP_valueX (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-% Hints: contents = cellstr(get(hObject,'String')) returns POPUP_valueX contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from POPUP_valueX
-
-
-% --- Executes during object creation, after setting all properties.
-function POPUP_valueX_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to POPUP_valueX (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-% --- Executes on selection change in POPUP_valueY.
-function POPUP_valueY_Callback(hObject, eventdata, handles)
-% hObject    handle to POPUP_valueY (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-% Hints: contents = cellstr(get(hObject,'String')) returns POPUP_valueY contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from POPUP_valueY
-
-
-% --- Executes during object creation, after setting all properties.
-function POPUP_valueY_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to POPUP_valueY (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-
 % --- Executes on slider movement.
 function SLID_Pi_Callback(hObject, eventdata, handles)
 % hObject    handle to SLID_Pi (see GCBO)
@@ -336,7 +291,7 @@ set(handles.TXT_coverage, 'String',...
 % selected and color each point according to the value of its robustness
 % To have more details tape 'help plot_rectangles_and_colore_selected_one'
 axes(handles.GRAPH_graph1)
-plot_rectangles_and_colore_selected_one(DATA.(valeurs), x, y, column)
+plot_rectangles(DATA.(valeurs), x, y, column)
 
 % Make a new part of the UI visible
 set(handles.GRAPH_graph1, 'Visible', 'On')
@@ -383,7 +338,7 @@ set(handles.TXT_coverage, 'String',...
 
 % Plot rectangle in the graph on the right and color the border of the
 % selected one and the points inside it
-plot_rectangles_and_colore_selected_one(DATA.(valeurs), x, y, column)
+plot_rectangles(DATA.(valeurs), x, y, column)
 
 
 
@@ -421,10 +376,10 @@ name_fields = fieldnames(DATA) ;
 valeurs = name_fields{handles.TXT_Name_data.Value} ;
 
 % call of the function to plot the x and y selected 
-% to have more detail tape 'help interactive_graph'
-interactive_graph(DATA.(valeurs), x, y, column)
+% to have more detail tape 'help plot_robustness'
+plot_robustness(DATA.(valeurs), x, y, column)
 
-disp('Open interactive graph ')
+disp('Open new graph ')
 disp('Use left click on the points to get their robustness value and their position')
 disp('Use right click to delete all the texts on the figure')
 disp('-------------------------------------------------------------------------------------')

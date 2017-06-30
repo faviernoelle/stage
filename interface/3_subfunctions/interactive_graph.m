@@ -5,7 +5,7 @@ function interactive_graph(Out, i, j, rectangle, varargin)
 % choosen. Each point is coloured thanks to the value of its robustness.
 %
 % i and j are the projection dimension selected 
-% Out is the structure contening the data to study. Must be a StatFalsify
+% Out = data to test. Must be a StatFalsify
 % rectangle correpond to the selected rectangle 
 % Explanation of the parameters retangle with the structure StatFalsify : 
 % Out.clusters{rectangle, rectangle}.pts
