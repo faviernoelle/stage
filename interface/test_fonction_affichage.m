@@ -16,12 +16,14 @@ clc
 
 addPath
 
-% load new_data
-% load Data_to_test
-load donnees_nono
+% load data_a_tester
+% load data_test
+load all_exp
 
 
 global DATA
+DATA = data ;
+
 
 
 % interactive_graph(DATA.Exp1, 1, 2, 1)

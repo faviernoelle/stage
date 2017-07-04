@@ -22,7 +22,7 @@ function varargout = GUI_interactive_graph(varargin)
 
 % Edit the above text to modify the response to help GUI_interactive_graph
 
-% Last Modified by GUIDE v2.5 29-Jun-2017 10:33:47
+% Last Modified by GUIDE v2.5 03-Jul-2017 17:40:28
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -82,6 +82,7 @@ set(handles.PANEL_Plot_robustness, 'Visible', 'Off')
 set(handles.GRAPH_graph1, 'Visible', 'Off')
 set(handles.GRAPH_coverage,'Visible', 'Off')
 set(handles.PANEL_coverage, 'Visible', 'Off')
+set(handles.PANEL_dim, 'Visible', 'Off')
 
 % Adding images
 disp('- Adding images')
@@ -162,7 +163,6 @@ set(handles.TXT_Pi_value, 'String', num2str(handles.SLID_Pi.Value(1))) ;
 set(handles.TXT_Pj_min,   'String', num2str(1)) ;
 set(handles.TXT_Pj_max,   'String', num2str(numel(DATA.(valeurs).clusters{1}.pts(1,:)))) ;
 set(handles.TXT_Pj_value, 'String', num2str(handles.SLID_Pj.Value(1))) ;
-
 
 % Select data to set intervale of the sliders
 sliderMin = get(handles.SLID_Pi, 'Min') ;
@@ -287,6 +287,10 @@ set(handles.TXT_coverage, 'String',...
     ['local coverage = ' num2str(DATA.(valeurs).coverage(column))])
 
 
+% Set parameter in panel 'add limits on projection dimensions'
+set(handles.POPUP_dim, 'String', num2str((1:numel(DATA.(valeurs).clusters{column}.pts(1,:)))'))
+
+
 % Plot in the graph on the left the rectangles in projection dimension
 % selected and color each point according to the value of its robustness
 % To have more details tape 'help plot_rectangles_and_colore_selected_one'
@@ -296,6 +300,7 @@ plot_rectangles(DATA.(valeurs), x, y, column)
 % Make a new part of the UI visible
 set(handles.GRAPH_graph1, 'Visible', 'On')
 set(handles.PANEL_Plot_robustness, 'Visible', 'On')
+set(handles.PANEL_dim, 'Visible', 'On')
 
 
 disp('Plot rectangles')
@@ -404,6 +409,8 @@ column = handles.POPUP_rectangle.Value ;
 name_fields = fieldnames(DATA) ;
 valeurs = name_fields{handles.TXT_Name_data.Value} ;
 
+
+disp('Plot signal')
 plot_signal(DATA.(valeurs), x, y, column)
 
 
@@ -493,3 +500,113 @@ bakCD = cd ;
 cd(Pathname) ;
 saveas(handles.figure1,Filename)
 cd(bakCD) ;
+
+
+
+% --- Executes on selection change in POPUP_dim.
+function POPUP_dim_Callback(hObject, eventdata, handles)
+% hObject    handle to POPUP_dim (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns POPUP_dim contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from POPUP_dim
+
+
+% --- Executes during object creation, after setting all properties.
+function POPUP_dim_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to POPUP_dim (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in pushbutton6.
+function pushbutton6_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton6 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on selection change in listbox2.
+function listbox2_Callback(hObject, eventdata, handles)
+% hObject    handle to listbox2 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns listbox2 contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from listbox2
+
+
+% --- Executes during object creation, after setting all properties.
+function listbox2_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to listbox2 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: listbox controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in pushbutton8.
+function pushbutton8_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton8 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+
+function EDIT_min_range_Callback(hObject, eventdata, handles)
+% hObject    handle to EDIT_min_range (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of EDIT_min_range as text
+%        str2double(get(hObject,'String')) returns contents of EDIT_min_range as a double
+% Set parameters of the table
+handles.listbox2.String = get(handles.POPUP_dim,'Value') ;
+% handles.listbox2.UserData(1,2) = num2str(handles.EDIT_min_range.Value) ;
+% handles.listbox2.UserData(1,3) = num2str(handles.EDIT_max_range.Value) ;
+
+% --- Executes during object creation, after setting all properties.
+function EDIT_min_range_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to EDIT_min_range (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function EDIT_max_range_Callback(hObject, eventdata, handles)
+% hObject    handle to EDIT_max_range (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of EDIT_max_range as text
+%        str2double(get(hObject,'String')) returns contents of EDIT_max_range as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function EDIT_max_range_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to EDIT_max_range (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
