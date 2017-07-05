@@ -22,7 +22,7 @@ function varargout = GUI_interactive_graph(varargin)
 
 % Edit the above text to modify the response to help GUI_interactive_graph
 
-% Last Modified by GUIDE v2.5 03-Jul-2017 17:40:28
+% Last Modified by GUIDE v2.5 05-Jul-2017 14:24:44
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -53,7 +53,6 @@ function GUI_interactive_graph_OpeningFcn(hObject, eventdata, handles, varargin)
 % varargin   command line arguments to GUI_interactive_graph (see VARARGIN)
 
 
-clc
 cla(handles.GRAPH_graph1) 
 
 % Informing the user
@@ -62,7 +61,7 @@ disp(' Welcome ! ')
 disp('-------------------------------------------------------------------------------------')
 disp('Initialization : ')
 disp('- Adding to path all subfolders of the project')
-% addPath() % Adding to path all subfolders of the project
+addPath % Adding to path all subfolders of the project
 
 % Set properties of objects
 disp('- Set properties of objects')
@@ -199,8 +198,6 @@ function SLID_Pi_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
 
-global DATA
-
 set(handles.TXT_Pi_value, 'String', num2str(floor(handles.SLID_Pi.Value(1)))) ;
 
 
@@ -301,6 +298,14 @@ plot_rectangles(DATA.(valeurs), x, y, column)
 set(handles.GRAPH_graph1, 'Visible', 'On')
 set(handles.PANEL_Plot_robustness, 'Visible', 'On')
 set(handles.PANEL_dim, 'Visible', 'On')
+
+
+
+global TAB_DIM
+TAB_DIM = zeros(10,3) ;
+TAB_DIM(:,3) = 40 ; 
+TAB_DIM(:,1) = 1:length(handles.POPUP_dim.String) ;
+
 
 
 disp('Plot rectangles')
@@ -526,41 +531,41 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on button press in pushbutton6.
-function pushbutton6_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton6 (see GCBO)
+% --- Executes on button press in BUT_reset_lim.
+function BUT_reset_lim_Callback(hObject, eventdata, handles)
+% hObject    handle to BUT_reset_lim (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+set(handles.LIST_dim, 'String', [])
+
+global TAB_DIM
+TAB_DIM = zeros(10,3) ;
+TAB_DIM(:,3) = 40 ; 
+TAB_DIM(:,1) = 1:length(handles.POPUP_dim.String) ;
 
 
-% --- Executes on selection change in listbox2.
-function listbox2_Callback(hObject, eventdata, handles)
-% hObject    handle to listbox2 (see GCBO)
+% --- Executes on button press in BUT_suppr_lim.
+function BUT_suppr_lim_Callback(hObject, eventdata, handles)
+% hObject    handle to BUT_suppr_lim (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+a = handles.LIST_dim.Value ;
+old_str = get(handles.LIST_dim, 'String') ;
+old_str(a)=[] ;
 
-% Hints: contents = cellstr(get(hObject,'String')) returns listbox2 contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from listbox2
+set(handles.LIST_dim, 'String', old_str)
 
-
-% --- Executes during object creation, after setting all properties.
-function listbox2_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to listbox2 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: listbox controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
+global TAB_DIM
+TAB_DIM(a,2) = 0 ;
+TAB_DIM(a,3) = 40 ;
 
 
-% --- Executes on button press in pushbutton8.
-function pushbutton8_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton8 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+current_str = get(handles.LIST_dim, 'String') ;
+to_plot = str2num(current_str(handles.LIST_dim.Value)) ;
+
+handles.TXT_min_range.String{1} = TAB_DIM(to_plot,2) ;
+handles.TXT_max_range.String{1} = TAB_DIM(to_plot,3) ;
+
 
 
 
@@ -606,6 +611,108 @@ function EDIT_max_range_CreateFcn(hObject, eventdata, handles)
 % handles    empty - handles not created until after all CreateFcns called
 
 % Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in BUT_new_rect.
+function BUT_new_rect_Callback(hObject, eventdata, handles)
+% hObject    handle to BUT_new_rect (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+axes(handles.GRAPH_graph1)
+cla
+
+global TAB_DIM DATA
+
+% recover x and y you wnat to plot
+x = floor(handles.SLID_Pi.Value) ;
+y = floor(handles.SLID_Pj.Value) ;
+
+% Recover the zone you want to plot
+column = handles.POPUP_rectangle.Value ;
+
+% Get the name of the fields contained in DATA
+name_fields = fieldnames(DATA) ;
+valeurs = name_fields{handles.TXT_Name_data.Value} ;
+
+plot_new_rectangles(DATA.(valeurs),x, y,column, TAB_DIM)
+disp('Plot new rectangles')
+
+
+% --- Executes on button press in BUT_limit.
+function BUT_limit_Callback(hObject, eventdata, handles)
+% hObject    handle to BUT_limit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+val = handles.POPUP_dim.Value ;
+a = num2str(val) ;
+
+old_str = get(handles.LIST_dim, 'String') ;
+
+N = length(old_str) ;
+
+for i=1:N
+    if a == old_str(i)
+        old_str(i) = [] ;
+        break
+    end
+end
+
+str_part = a ;
+
+new_str = strvcat(old_str, str_part) ;
+set(handles.LIST_dim, 'String', new_str)
+
+global TAB_DIM
+
+
+
+TAB_DIM(val,2) = str2num(handles.EDIT_min_range.String) ;
+TAB_DIM(val,3) = str2num(handles.EDIT_max_range.String) ;
+
+TAB_DIM
+
+% array = [handles.POPUP_limit.String; num2str(handles.POPUP_dim.Value)] ;
+% handles.POPUP_limit.String = array ;
+% 
+handles.TXT_min_range.String{1} = handles.EDIT_min_range.String ;
+handles.TXT_max_range.String{1} = handles.EDIT_max_range.String ;
+
+
+nb_elem = length(handles.LIST_dim.String) ;
+
+
+set(handles.LIST_dim, 'Value', nb_elem)
+
+
+% --- Executes on selection change in LIST_dim.
+function LIST_dim_Callback(hObject, eventdata, handles)
+% hObject    handle to LIST_dim (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns LIST_dim contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from LIST_dim
+
+current_str = get(handles.LIST_dim, 'String') ;
+to_plot = str2num(current_str(handles.LIST_dim.Value)) ;
+
+global TAB_DIM 
+
+handles.TXT_min_range.String{1} = TAB_DIM(to_plot,2) ;
+handles.TXT_max_range.String{1} = TAB_DIM(to_plot,3) ;
+
+% --- Executes during object creation, after setting all properties.
+function LIST_dim_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to LIST_dim (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: listbox controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
