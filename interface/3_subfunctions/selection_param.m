@@ -116,7 +116,7 @@ sliderMax_time = get(handles.SLID_max_time, 'Max') ;
 SliderStep_time = [100 200] / (sliderMax_time - sliderMin_time) ;
 % Set parameters of this slider
 set(handles.SLID_max_time, 'SliderStep', SliderStep_time)  ;
-set(handles.SLID_max_time, 'Value', 200) ;
+set(handles.SLID_max_time, 'Value', 2000) ;
 % Set text under this slider
 set(handles.TXT_time_min, 'String', num2str(200))
 set(handles.TXT_time_max, 'String', num2str(5000))
@@ -286,10 +286,14 @@ function BUT_start_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 
-global first_simu
+global first_simu Out DATA
 
 if first_simu ~= 1
-    Init
+    cbs_reinit
+%     Out = [] ;
+%     Out = DATA.exp ;
+else 
+%     Out = [] ;
 end
 
 
@@ -308,9 +312,6 @@ disp('Lancer simu')
 rng(r,'twister');  
 timervar_1 = tic;
 
-global Out
-Out = [] ;
-
 set(handles.BUT_stop,'Visible','On')
 
 global start
@@ -319,6 +320,8 @@ start = 1 ;
 Out = StatFalsify(Out, CBS, phi, w_rob, init_sim, max_sim, time_lim);
 
 first_simu = 0 ;
+
+DATA = struct('exp', Out) ; 
 
 set(handles.BUT_visu,'Visible','On')
 
@@ -335,6 +338,7 @@ function BUT_stop_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 global start
 start = 0 ;
+
 
 
 
