@@ -52,7 +52,6 @@ function selection_param_OpeningFcn(hObject, eventdata, handles, varargin)
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to selection_param (see VARARGIN)
 
-
 % Set parameters of all sliders
 
 % Set parameters of slider SLID_rob_wt
@@ -129,13 +128,10 @@ fprintf('\n Limit on number of simulations during global search is %d.\n',...
 fprintf('\n Threshold number of samples for classification is %d\n ',...
     get(handles.SLID_min_sample,'Value'))
 
-
-
-
 global start
 start = 1 ;
 
-
+set(handles.BUT_start,'Visible','On')
 set(handles.BUT_stop,'Visible','Off')
 set(handles.BUT_visu,'Visible','Off')
 
@@ -159,33 +155,6 @@ function varargout = selection_param_OutputFcn(hObject, eventdata, handles)
 
 % Get default command line output from handles structure
 varargout{1} = handles.output;
-
-
-% --- Executes on button press in RBUT_robustness.
-function RBUT_robustness_Callback(hObject, eventdata, handles)
-% hObject    handle to RBUT_robustness (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of RBUT_robustness
-
-
-% --- Executes on button press in RBUT_coverage.
-function RBUT_coverage_Callback(hObject, eventdata, handles)
-% hObject    handle to RBUT_coverage (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of RBUT_coverage
-
-
-% --- Executes on button press in radiobutton3.
-function radiobutton3_Callback(hObject, eventdata, handles)
-% hObject    handle to radiobutton3 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of radiobutton3
 
 
 % --- Executes on slider movement.
@@ -267,6 +236,7 @@ function SLID_max_time_Callback(hObject, eventdata, handles)
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
 set(handles.TXT_time_current, 'String', num2str( 100 * floor(handles.SLID_max_time.Value/100)))
 
+
 % --- Executes during object creation, after setting all properties.
 function SLID_max_time_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to SLID_max_time (see GCBO)
@@ -285,25 +255,25 @@ function BUT_start_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-
-global first_simu Out DATA
-
-if first_simu ~= 1
-    cbs_reinit
-%     Out = [] ;
-%     Out = DATA.exp ;
-else 
-%     Out = [] ;
-end
+set(handles.BUT_stop,'Visible','On')
+set(handles.BUT_start,'Visible','Off')
+set(handles.BUT_start, 'String', 'Continue simulation')
 
 
 % global ROB_WT MIN_SAMPLE MAX_SIMU MAX_TIME 
 global r CBS phi
-
 w_rob    = 0.01 * floor(handles.SLID_rob_wt.Value     * 100) ;
 init_sim = 5    * floor(handles.SLID_min_sample.Value / 5)   ;
 max_sim  = 50   * floor(handles.SLID_max_simu.Value   / 50)  ; 
 time_lim = 100  * floor(handles.SLID_max_time.Value   / 100) ;
+
+global first_simu Out DATA start
+if first_simu ~= 1
+    cbs_reinit     
+else 
+ Out = [] ;
+ first_simu = 0 ;   
+end
 
 % Lancer simulation
 disp('Lancer simu')
@@ -312,14 +282,11 @@ disp('Lancer simu')
 rng(r,'twister');  
 timervar_1 = tic;
 
-set(handles.BUT_stop,'Visible','On')
 
-global start
+
 start = 1 ;
 
 Out = StatFalsify(Out, CBS, phi, w_rob, init_sim, max_sim, time_lim);
-
-first_simu = 0 ;
 
 DATA = struct('exp', Out) ; 
 
@@ -330,7 +297,6 @@ fname = ['cl',num2str(r)];
 save(fname, 'Out')
 
 
-
 % --- Executes on button press in BUT_stop.
 function BUT_stop_Callback(hObject, eventdata, handles)
 % hObject    handle to BUT_stop (see GCBO)
@@ -338,11 +304,7 @@ function BUT_stop_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 global start
 start = 0 ;
-
-
-
-
-
+set(handles.BUT_start,'Visible','On')
 
 
 % --- Executes on button press in BUT_visu.
@@ -355,4 +317,4 @@ global Out DATA
 
 DATA = struct('exp', Out) ; 
 
-GUI_interactive_graph
+coverage_inspection
