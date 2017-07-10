@@ -49,7 +49,7 @@ Sys = BrSys.copy;
 Sys.SetParamRanges(signal_u0,ones(PARAM.Nb_point,1)*[0 PARAM.max_pedal_angle]);
 Sys.SetParam(signal_u1,ones(PARAM.Nb_point,1)*PARAM.engine_speed);
 Sys.SetParam(signal_u2,ones(PARAM.Nb_point,1)*PARAM.Sensor_Offset);
-Sys.SetEpsGridsize(PARAM.Grid_discretisation*ones(PARAM.Nb_point,1));
+Sys.SetEpsGridsize(PARAM.Grid_discretisation);
 Sys.SetDeltaGridsize(2*Sys.epsgridsize);
 
 global CBS 

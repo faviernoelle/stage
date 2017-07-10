@@ -1,4 +1,4 @@
-function plot_new_rectangles(Out,i, j,column, limits)
+function plot_new_rectangles(Out,i, j,column, PARAM)
 
 % plot_rectangles(Out,i,j,column)
 % Out = data to plot. Must be a statFalsify object
@@ -15,8 +15,8 @@ function plot_new_rectangles(Out,i, j,column, limits)
 % w = width of the rectangle
 % h = height of the rectangle
 
-limite_x = [limits(i,2) limits(i,3)] ;
-limite_y = [limits(j,2) limits(j,3)] ;
+limite_x = [PARAM.tab_dim(i,2) PARAM.tab_dim(i,3)] ;
+limite_y = [PARAM.tab_dim(j,2) PARAM.tab_dim(j,3)] ;
 
 % axis ([limite_x limite_y]) ;
 

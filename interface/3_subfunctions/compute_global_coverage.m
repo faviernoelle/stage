@@ -1,12 +1,12 @@
-function global_coverage = compute_global_coverage(Out)
+function global_coverage = compute_global_coverage(Out, PARAM)
 
 % Compute global coverage based on cell occupancy method
 % Out = data to test. Must be a StatFalsify object
 
-N = length(Out.nominal_ranges) ;
+N = PARAM.Nb_point ;
 
-Eps_grid_size = 4*ones(N,1) ; 
-% cf line 54 of file PTC_Demo (size of the grid used to compute the coverage)
+Eps_grid_size = PARAM.Grid_discretisation ; 
+
 
 sum_log = 0 ;
 

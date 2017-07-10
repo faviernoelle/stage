@@ -66,7 +66,11 @@ addPath % Adding to path all subfolders of the project
 % Set properties of objects
 disp('- Set properties of objects')
 
-global DATA
+global DATA PARAM
+
+[PARAM(:).tab_dim] = zeros(PARAM.Nb_point,3) ;
+PARAM.tab_dim(:,3) = PARAM.max_pedal_angle ; 
+PARAM.tab_dim(:,1) = 1:PARAM.Nb_point ;
 
 % Getting the name of the differents data to post
 name_fields = fieldnames(DATA) ;
@@ -98,7 +102,7 @@ column = handles.POPUP_rectangle.Value ;
 disp('- plot global coverage and show its value ')
 % Compute global coverage value (call function compute_global_coverage)
 % See help compute_global_coverage to get more details
-coverage = compute_global_coverage(DATA.(valeurs)) ;
+coverage = compute_global_coverage(DATA.(valeurs), PARAM) ;
 % Disp value of coverage in the panel 
 set(handles.TXT_global_coverage, 'String', coverage)
 
@@ -148,19 +152,15 @@ set(handles.TXT_size_rect_y, 'String',...
 set(handles.TXT_coverage, 'String',...
     ['local coverage = ' num2str(DATA.(valeurs).coverage(column))])
 axes(handles.GRAPH_graph1)
-plot_rectangles(DATA.(valeurs), x, y, column)
+plot_new_rectangles(DATA.(valeurs), x, y, column, PARAM)
 
 disp('- Set parameter in panel "add limits on projection dimensions" ')
 % Set parameter in panel 'add limits on projection dimensions'
-set(handles.POPUP_dim, 'String', num2str((1:numel(DATA.(valeurs).clusters{column}.pts(1,:)))'))
+set(handles.POPUP_dim, 'String', num2str((1:PARAM.Nb_point)'))
 
 disp('- Reset the limits on dimensions')
 % Reset the limits on dimensions
 set(handles.LIST_dim, 'String', [])
-global TAB_DIM
-TAB_DIM = zeros(10,3) ;
-TAB_DIM(:,3) = 40 ; 
-TAB_DIM(:,1) = 1:length(handles.POPUP_dim.String) ;
 
 disp('End initialization')
 disp('-------------------------------------------------------------------------------------')
@@ -198,7 +198,7 @@ function POPUP_Name_data_Callback(hObject, eventdata, handles)
 % Hints: contents = cellstr(get(hObject,'String')) returns POPUP_Name_data contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from POPUP_Name_data
 % Set parameter of every panels
-global DATA
+global DATA PARAM
 name_fields = fieldnames(DATA) ;
 valeurs = name_fields{handles.POPUP_Name_data.Value} ;
 disp('-------------------------------------------------------------------------------------')
@@ -221,7 +221,7 @@ column = handles.POPUP_rectangle.Value ;
 disp('plot global coverage and show its value ')
 % Compute global coverage value (call function compute_global_coverage)
 % See help compute_global_coverage to get more details
-coverage = compute_global_coverage(DATA.(valeurs)) ;
+coverage = compute_global_coverage(DATA.(valeurs), PARAM) ;
 % Disp value of coverage in the panel 
 set(handles.TXT_global_coverage, 'String', coverage)
 
@@ -269,7 +269,7 @@ set(handles.TXT_size_rect_y, 'String',...
 set(handles.TXT_coverage, 'String',...
     ['local coverage = ' num2str(DATA.(valeurs).coverage(column))])
 axes(handles.GRAPH_graph1)
-plot_rectangles(DATA.(valeurs), x, y, column)
+plot_new_rectangles(DATA.(valeurs), x, y, column, PARAM)
 
 disp('Set parameter in panel "add limits on projection dimensions" ')
 % Set parameter in panel 'add limits on projection dimensions'
@@ -278,10 +278,10 @@ set(handles.POPUP_dim, 'String', num2str((1:numel(DATA.(valeurs).clusters{column
 disp('Reset the limits on dimensions')
 % Reset the limits on dimensions
 set(handles.LIST_dim, 'String', [])
-global TAB_DIM
-TAB_DIM = zeros(10,3) ;
-TAB_DIM(:,3) = 40 ; 
-TAB_DIM(:,1) = 1:length(handles.POPUP_dim.String) ;
+
+PARAM.tab_dim = zeros(10,3) ;
+PARAM.tab_dim(:,3) = PARAM.max_pedal_angle ; 
+PARAM.tab_dim(:,1) = 1:length(handles.POPUP_dim.String) ;
 
 
 % --- Executes during object creation, after setting all properties.
@@ -357,7 +357,7 @@ end
 % --- Executes on button press in BUT_plot_rectangles.
 function BUT_plot_rectangles_Callback(hObject, eventdata, handles)
 
-global DATA TAB_DIM
+global DATA PARAM
 
 % hObject    handle to BUT_plot_rectangles (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -394,7 +394,7 @@ set(handles.TXT_coverage, 'String',...
 % selected and color each point according to the value of its robustness
 % To have more details tape 'help plot_rectangles_and_colore_selected_one'
 axes(handles.GRAPH_graph1)
-plot_new_rectangles(DATA.(valeurs), x, y, column, TAB_DIM)
+plot_new_rectangles(DATA.(valeurs), x, y, column, PARAM)
 
 disp('Plot rectangles')
 disp('-------------------------------------------------------------------------------------')
@@ -411,7 +411,7 @@ function POPUP_rectangle_Callback(hObject, eventdata, handles)
 
 cla(handles.GRAPH_graph1)  % clear axes
 
-global DATA TAB_DIM
+global DATA PARAM
 
 % recover x and y you wnat to plot
 x = floor(handles.SLID_Pi.Value) ;
@@ -434,8 +434,8 @@ set(handles.TXT_coverage, 'String',...
 
 % Plot rectangle in the graph on the right and color the border of the
 % selected one and the points inside it
-plot_new_rectangles(DATA.(valeurs), x, y, column, TAB_DIM)
-disp(TAB_DIM)
+plot_new_rectangles(DATA.(valeurs), x, y, column, PARAM)
+disp(PARAM.tab_dim)
 
 
 % --- Executes during object creation, after setting all properties.
@@ -458,7 +458,7 @@ function BUT_robustness_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-global DATA
+global DATA PARAM
 
 % recover x and y you wnat to plot
 x = floor(handles.SLID_Pi.Value) ;
@@ -473,7 +473,7 @@ valeurs = name_fields{handles.POPUP_Name_data.Value} ;
 
 % call of the function to plot the x and y selected 
 % to have more detail tape 'help plot_robustness'
-plot_robustness(DATA.(valeurs), x, y, column)
+plot_robustness(DATA.(valeurs), x, y, column, PARAM)
 
 disp('Open new graph ')
 disp('Use left click on the points to get their robustness value and their position')
@@ -487,7 +487,7 @@ function BUT_plot_signal_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-global DATA
+global DATA PARAM
 
 % recover x and y you wnat to plot
 x = floor(handles.SLID_Pi.Value) ;
@@ -501,7 +501,7 @@ name_fields = fieldnames(DATA) ;
 valeurs = name_fields{handles.POPUP_Name_data.Value} ;
 
 disp('Plot signal')
-plot_signal(DATA.(valeurs), x, y, column)
+plot_signal(DATA.(valeurs), x, y, column, PARAM)
 
 disp('Open new graph ')
 disp('Use left click on the points to plot their signal')
@@ -517,8 +517,11 @@ function POPUP_dim_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns POPUP_dim contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from POPUP_dim
+
+global PARAM
+
 set(handles.EDIT_min_range,'String',0)
-set(handles.EDIT_max_range,'String',40)
+set(handles.EDIT_max_range,'String',PARAM.max_pedal_angle)
 
 
 % --- Executes during object creation, after setting all properties.
@@ -589,7 +592,7 @@ function BUT_new_rect_Callback(hObject, eventdata, handles)
 axes(handles.GRAPH_graph1)
 cla % clear axe
 
-global TAB_DIM DATA
+global PARAM DATA
 
 % recover x and y and the rectangle you wnat to plot
 x = floor(handles.SLID_Pi.Value) ;
@@ -600,7 +603,7 @@ column = handles.POPUP_rectangle.Value ;
 name_fields = fieldnames(DATA) ;
 valeurs = name_fields{handles.POPUP_Name_data.Value} ;
 
-plot_new_rectangles(DATA.(valeurs),x, y,column, TAB_DIM)
+plot_new_rectangles(DATA.(valeurs),x, y,column, PARAM)
 disp('Plot limited rectangles')
 
 
@@ -610,16 +613,23 @@ function BUT_limit_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+global PARAM
+
 val = handles.POPUP_dim.Value ;
 a = num2str(val) ;
 
+
 old_str = get(handles.LIST_dim, 'String') ;
 
-N = length(old_str) ;
+if isempty(old_str)
+    N = 0 ;
+else
+    N = numel(old_str(:,1)) ;
+end
 
 for i=1:N
-    if a == old_str(i)
-        old_str(i) = [] ;
+    if val == str2double(old_str(i,:))
+        old_str(i,:) = [] ;
         break
     end
 end
@@ -629,17 +639,15 @@ str_part = a ;
 new_str = strvcat(old_str, str_part) ;
 set(handles.LIST_dim, 'String', new_str)
 
-global TAB_DIM
-
-TAB_DIM(val,2) = str2double(handles.EDIT_min_range.String) ;
-TAB_DIM(val,3) = str2double(handles.EDIT_max_range.String) ;
+PARAM.tab_dim(val,2) = str2double(handles.EDIT_min_range.String) ;
+PARAM.tab_dim(val,3) = str2double(handles.EDIT_max_range.String) ;
 
 disp('Affichage des limites')
-disp(TAB_DIM)
+disp(PARAM.tab_dim)
 
 handles.TXT_min_range.String{1} = handles.EDIT_min_range.String ;
 handles.TXT_max_range.String{1} = handles.EDIT_max_range.String ;
-nb_elem = length(handles.LIST_dim.String) ;
+nb_elem = numel(handles.LIST_dim.String(:,1)) ;
 
 set(handles.LIST_dim, 'Value', nb_elem)
 
@@ -655,13 +663,13 @@ function LIST_dim_Callback(hObject, eventdata, handles)
 
 % Get the dimension selected
 current_str = get(handles.LIST_dim, 'String') ;
-to_plot = str2double(current_str(handles.LIST_dim.Value)) ;
+to_plot = str2double(current_str(handles.LIST_dim.Value,:)) ;
 
-global TAB_DIM 
+global PARAM 
 
 % write limits on dimension selected
-handles.TXT_min_range.String{1} = TAB_DIM(to_plot,2) ;
-handles.TXT_max_range.String{1} = TAB_DIM(to_plot,3) ;
+handles.TXT_min_range.String{1} = PARAM.tab_dim(to_plot,2) ;
+handles.TXT_max_range.String{1} = PARAM.tab_dim(to_plot,3) ;
 
 % --- Executes during object creation, after setting all properties.
 function LIST_dim_CreateFcn(hObject, eventdata, handles)
@@ -686,10 +694,17 @@ function BUT_reset_lim_Callback(hObject, eventdata, handles)
 set(handles.LIST_dim, 'String', [])
 
 % reset table containing the limits
-global TAB_DIM
-TAB_DIM = zeros(10,3) ;
-TAB_DIM(:,3) = 40 ; 
-TAB_DIM(:,1) = 1:length(handles.POPUP_dim.String) ;
+global PARAM
+PARAM.tab_dim = zeros(PARAM.Nb_point,3) ;
+PARAM.tab_dim(:,3) = PARAM.max_pedal_angle ; 
+PARAM.tab_dim(:,1) = 1:PARAM.Nb_point ;
+
+set(handles.LIST_dim, 'Value', 1)
+set(handles.POPUP_dim, 'Value', 1)
+set(handles.EDIT_min_range, 'String', 0)
+set(handles.EDIT_max_range, 'String', 40)
+set(handles.TXT_min_range, 'String', 0)
+set(handles.TXT_max_range, 'String', 40)
 
 
 % --- Executes on button press in BUT_suppr_lim.
@@ -700,20 +715,21 @@ function BUT_suppr_lim_Callback(hObject, eventdata, handles)
 
 a = handles.LIST_dim.Value ;
 new_str = get(handles.LIST_dim, 'String') ;
-new_str(a)=[] ;
+new_str(a,:)=[] ;
 
+set(handles.LIST_dim, 'Value', length(new_str(:,1))) 
 set(handles.LIST_dim, 'String', new_str)
 
-global TAB_DIM
-TAB_DIM(a,2) = 0 ;
-TAB_DIM(a,3) = 40 ;
+global PARAM
+PARAM.tab_dim(a,2) = 0 ;
+PARAM.tab_dim(a,3) = PARAM.max_pedal_angle ;
 
 % write on the textbox the value of the selected dimension
 current_str = get(handles.LIST_dim, 'String') ;
-to_plot = str2double(current_str(handles.LIST_dim.Value)) ;
+to_plot = str2double(current_str(handles.LIST_dim.Value,:)) ;
 
-handles.TXT_min_range.String{1} = TAB_DIM(to_plot,2) ;
-handles.TXT_max_range.String{1} = TAB_DIM(to_plot,3) ;
+handles.TXT_min_range.String{1} = PARAM.tab_dim(to_plot,2) ;
+handles.TXT_max_range.String{1} = PARAM.tab_dim(to_plot,3) ;
 
 
 % --------------------------------------------------------------------
@@ -721,7 +737,7 @@ function MENU_help_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_help (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-warning('TO DO')
+
 
 
 % --------------------------------------------------------------------

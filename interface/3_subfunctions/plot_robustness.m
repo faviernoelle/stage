@@ -1,4 +1,4 @@
-function plot_robustness(Out, i, j, rectangle, varargin)
+function plot_robustness(Out, i, j, rectangle, PARAM, varargin)
 
 % interactive_graph(Out, i, j,rectangle, varargin)
 % Open in a new window a graph with the points contained in the rectangle
@@ -24,23 +24,38 @@ H = figure() ;
 colormap(jet_inverted)
 
 % selection of the points
-x = Out.clusters{COLUMN}.pts(:,i);
-y = Out.clusters{COLUMN}.pts(:,j);
-% Selection of the data for the range of the color
-c = Out.clusters{COLUMN}.vals(:) ;
+pt = 1 ;
+
+limite_x = [PARAM.tab_dim(i,2) PARAM.tab_dim(i,3)] ;
+limite_y = [PARAM.tab_dim(j,2) PARAM.tab_dim(j,3)] ;
+
+for h=1:numel(Out.clusters{COLUMN}.pts(:,1))
+    if Out.clusters{COLUMN}.pts(h,i) < limite_x(2) && ...
+            Out.clusters{COLUMN}.pts(h,i) > limite_x(1) && ...
+            Out.clusters{COLUMN}.pts(h,j) < limite_y(2) && ...
+            Out.clusters{COLUMN}.pts(h,j) > limite_y(1)
+
+        x(pt) = Out.clusters{COLUMN}.pts(h,i);
+        y(pt) = Out.clusters{COLUMN}.pts(h,j);
+        % Selection of the data for the range of the color
+        c(pt) = Out.clusters{COLUMN}.vals(h) ;
+        pt = pt + 1 ;
+    end
+end
 
 % plot
 scatter(x,y,[],c)
 xlabel(['Projection dimension ', num2str(COLONE1)])
 ylabel(['Projection dimension ', num2str(COLONE2)])
+axis([limite_x limite_y])
 
 title(['Points in rectangle ' num2str(COLUMN) ' for x = ' num2str(i) ', y = ' num2str(j) ])
 
 % add color bar
 colorbar('')
 
-
-hold on
+% 
+% hold on
 
 % set dimension of the graphic
 % set(H, 'Position', [10 50 1350 687]);

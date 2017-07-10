@@ -22,7 +22,7 @@ function varargout = selection_param(varargin)
 
 % Edit the above text to modify the response to help selection_param
 
-% Last Modified by GUIDE v2.5 05-Jul-2017 09:42:41
+% Last Modified by GUIDE v2.5 10-Jul-2017 15:55:20
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -81,7 +81,7 @@ sliderMax_samp = get(handles.SLID_min_sample, 'Max') ;
 SliderStep_samp = [5 10] / (sliderMax_samp - sliderMin_samp) ;
 % Set parameters of this slider
 set(handles.SLID_min_sample, 'SliderStep', SliderStep_samp)  ;
-set(handles.SLID_min_sample, 'Value', 10) ;
+set(handles.SLID_min_sample, 'Value', 50) ;
 % Set text under this slider
 set(handles.TXT_sample_min, 'String', num2str(10))
 set(handles.TXT_sample_max, 'String', num2str(200))
@@ -135,6 +135,7 @@ set(handles.BUT_start,'Visible','On')
 set(handles.BUT_stop,'Visible','Off')
 set(handles.BUT_visu,'Visible','Off')
 
+set(handles.MENU_New,'Visible','Off')
 
 % Choose default command line output for selection_param
 handles.output = hObject;
@@ -317,4 +318,71 @@ global Out DATA
 
 DATA = struct('exp', Out) ; 
 
-coverage_inspection
+GUI_interactive_graph
+
+
+% --------------------------------------------------------------------
+function MENU_Callback(hObject, eventdata, handles)
+% hObject    handle to MENU (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function HELP_Callback(hObject, eventdata, handles)
+% hObject    handle to HELP (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function HELP_Help_Callback(hObject, eventdata, handles)
+% hObject    handle to HELP_Help (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+warning('TO DO')
+
+
+% --------------------------------------------------------------------
+function MENU_New_Callback(hObject, eventdata, handles)
+% hObject    handle to MENU_New (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+global first_simu
+
+first_simu = 1 ;
+Init ; % A revoir si c mieux de faire init ou start
+% fonctionne pas
+
+
+% --------------------------------------------------------------------
+function MENU_Save_Callback(hObject, eventdata, handles)
+% hObject    handle to MENU_Save (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+[Filename, Pathname] = uiputfile({'*.fig';'*.jpg';'*.png';'*.*'},'Save as'); 
+bakCD = cd ; 
+cd(Pathname) ;
+saveas(handles.figure1,Filename)
+cd(bakCD) ;
+% A tester
+
+
+% --------------------------------------------------------------------
+function MENU_Load_Callback(hObject, eventdata, handles)
+% hObject    handle to MENU_Load (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+[filename, Pathname] = uigetfile ;
+addpath(Pathname)
+open(filename)
+% A tester
+
+
+% --------------------------------------------------------------------
+function MENU_Close_Callback(hObject, eventdata, handles)
+% hObject    handle to MENU_Close (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+close selection_param
