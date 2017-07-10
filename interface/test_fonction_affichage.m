@@ -27,8 +27,8 @@ DATA = struct('exp', Out) ;
 % DATA = data ;
 
 % PARAM.tab_dim(1,3) = 20 ;
-PARAM.Nb_point = 15 ;
-PARAM.Grid_discretisation = zeros(15,1) + 4 ;
+PARAM.Nb_point = 10 ;
+PARAM.Grid_discretisation = zeros(10,1) + 4 ;
 
 % interactive_graph(DATA.Exp1, 1, 2, 1)
 GUI_interactive_graph
