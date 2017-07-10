@@ -32,7 +32,7 @@ BrSys.SetTime([0 simTime]);
 fprintf('\n Parametrizing input signal Pedal Angle as piecewise constant....\n')
 Input_Gen.type = 'UniStep';
 
-N = 15 ; % Number of control points
+N = 10 ; % Number of control points
 Input_Gen.cp = N;
 
 [PARAM(:).Nb_point] = N ;
