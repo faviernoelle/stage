@@ -5,8 +5,11 @@ close all
 clear vars
 InitBreach
 
+addPath
 
 %% Breach Interface Object Creation
+
+global PARAM
 
 model_name = 'AbstractFuelControl_M1NFM';
 load('AbstractFuelControl_M1.mat')
@@ -15,8 +18,10 @@ fprintf('\n Creating breach interface with simulink model %s\n',model_name)
 simTime = 50 ; 
 fprintf('\n Simulation time horizon is %d seconds\n',simTime)
 
-fprintf('\n Press any key to continue')
-pause
+PARAM = struct('simTime', simTime) ;
+
+% fprintf('\n Press any key to continue')
+% pause
 
 BrSys = CoverageBreachSet(model_name,{});
 BrSys.SetTime([0 simTime]);
@@ -27,13 +32,16 @@ BrSys.SetTime([0 simTime]);
 fprintf('\n Parametrizing input signal Pedal Angle as piecewise constant....\n')
 Input_Gen.type = 'UniStep';
 
-N = 10; % Number of control points
+N = 15 ; % Number of control points
 Input_Gen.cp = N;
+
+[PARAM(:).Nb_point] = N ;
+
 BrSys.SetInputGen(Input_Gen);
 fprintf('Number of control points is %d\n',N)
 
-fprintf('\n Press any key to continue\n')
-pause
+% fprintf('\n Press any key to continue\n')
+% pause
 
 %% Specifying parameter names
 for i=0:N-1
@@ -58,12 +66,17 @@ Sys.SetParam(signal_u2,ones(N,1)*1);
 Sys.SetEpsGridsize(4*ones(N,1));
 Sys.SetDeltaGridsize(2*Sys.epsgridsize);
 
+[PARAM(:).max_pedal_angle] = 40 ;
+[PARAM(:).engine_speed] = 1000 ;
+[PARAM(:).Sensor_Offset] = 1 ;
+[PARAM(:).Grid_discretisation] = 4*ones(N,1) ; 
+
 global CBS 
 CBS = Sys.copy();
 
 
-fprintf('\n Press any key to continue\n ')
-pause
+% fprintf('\n Press any key to continue\n ')
+% pause
 
 
 %% Specifying STL formula
@@ -75,8 +88,8 @@ phi = phi26;
 fprintf('\n The STL formula is\n ')
 disp(phi)
 
-fprintf('\n Press any key to continue\n')
-pause
+% fprintf('\n Press any key to continue\n')
+% pause
 
 %% Setting falsification method and parameters
 msg1 = sprintf('\nChoose a falsification method\n');
@@ -117,8 +130,8 @@ switch a
          global r
          r = input('0, 5000, 10000 or 15000\n');
          
-         fprintf('\n Press any key to continue\n')
-         pause
+%          fprintf('\n Press any key to continue\n')
+%          pause
         
 
             selection_param

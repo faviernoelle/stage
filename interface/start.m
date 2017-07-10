@@ -8,7 +8,11 @@ clc
 
 %%
 
+% global first_simu 
+% first_simu = 1 ;
+
+global Out
+Out = [] ;
+
 Init
 
-global first_simu 
-first_simu = 1 ;
