@@ -1,11 +1,13 @@
 % function Init()
 
+addPath
+
 bdclose all
 close all
 clear vars
 InitBreach
 
-addPath
+
 
 %% Breach Interface Object Creation
 
