@@ -253,10 +253,9 @@ classdef StatFalsify
       
     % Loop until maximum number of simulations or maximum number of random
     % attemps.
+     
     
-    global start 
-    
-    while (nb<nb_samples && time<max_time && ~falsified && nb_attempts<hits && start ==1)
+    while (nb<nb_samples && time<max_time && ~falsified && nb_attempts<hits )
 %       while (nb<nb_samples && time<max_time && ~falsified && nb_attempts<hits)
 
     % Generate a pseudo random point lying within the parameter ranges.                  

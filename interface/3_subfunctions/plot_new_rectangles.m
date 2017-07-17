@@ -80,9 +80,9 @@ for h = 1 : numel(Out.regions)
 end
 
 
-xlabel(['Projection dimension ', num2str(i)])
-ylabel(['Projection dimension ', num2str(j)])
-title(['Rectangles for x = ' num2str(i) ', y = ' num2str(j)])
+xlabel(['Dimension ', num2str(i)])
+ylabel(['Dimension ', num2str(j)])
+title(['Rectangles projected on dimension (' num2str(i) ', ' num2str(j) ') '])
 
 
 % add columnorbar

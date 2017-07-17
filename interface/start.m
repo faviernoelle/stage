@@ -11,8 +11,9 @@ clc
 % global first_simu 
 % first_simu = 1 ;
 
-global Out
+global Out COVERAGE
 Out = [] ;
+COVERAGE = [] ;
 
 Init
 

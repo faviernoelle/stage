@@ -22,7 +22,7 @@ function varargout = selection_param(varargin)
 
 % Edit the above text to modify the response to help selection_param
 
-% Last Modified by GUIDE v2.5 10-Jul-2017 15:55:20
+% Last Modified by GUIDE v2.5 11-Jul-2017 15:06:53
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -81,7 +81,7 @@ sliderMax_samp = get(handles.SLID_min_sample, 'Max') ;
 SliderStep_samp = [5 10] / (sliderMax_samp - sliderMin_samp) ;
 % Set parameters of this slider
 set(handles.SLID_min_sample, 'SliderStep', SliderStep_samp)  ;
-set(handles.SLID_min_sample, 'Value', 50) ;
+set(handles.SLID_min_sample, 'Value', 10) ;
 % Set text under this slider
 set(handles.TXT_sample_min, 'String', num2str(10))
 set(handles.TXT_sample_max, 'String', num2str(200))
@@ -128,12 +128,16 @@ fprintf('\n Limit on number of simulations during global search is %d.\n',...
 fprintf('\n Threshold number of samples for classification is %d\n ',...
     get(handles.SLID_min_sample,'Value'))
 
-global start
+global start n
 start = 1 ;
+n = 0 ;
 
 set(handles.BUT_start,'Visible','On')
 set(handles.BUT_stop,'Visible','Off')
 set(handles.BUT_visu,'Visible','Off')
+
+
+set(handles.BUT_start,'String','Start simulation')
 
 set(handles.MENU_New,'Visible','Off')
 
@@ -268,7 +272,11 @@ init_sim = 5    * floor(handles.SLID_min_sample.Value / 5)   ;
 max_sim  = 50   * floor(handles.SLID_max_simu.Value   / 50)  ; 
 time_lim = 100  * floor(handles.SLID_max_time.Value   / 100) ;
 
-global first_simu Out DATA start
+global first_simu Out DATA start COVERAGE n PARAM
+
+coverage = COVERAGE ;
+
+
 if first_simu ~= 1
     cbs_reinit     
 else 
@@ -284,10 +292,16 @@ rng(r,'twister');
 timervar_1 = tic;
 
 
-
 start = 1 ;
 
-Out = StatFalsify(Out, CBS, phi, w_rob, init_sim, max_sim, time_lim);
+while n <= max_sim  && start == 1 
+    nb_before_calc_coverage = 20 ; 
+    Out = StatFalsify(Out, CBS, phi, w_rob, init_sim, ...
+        nb_before_calc_coverage, time_lim) ;
+    coverage = [coverage ; compute_global_coverage(Out, PARAM) ] ;
+    COVERAGE = coverage ;
+    n = Out.num_samples(1,1) ;
+end
 
 DATA = struct('exp', Out) ; 
 
@@ -386,3 +400,4 @@ function MENU_Close_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 close selection_param
+

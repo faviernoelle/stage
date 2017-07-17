@@ -66,7 +66,7 @@ addPath % Adding to path all subfolders of the project
 % Set properties of objects
 disp('- Set properties of objects')
 
-global DATA PARAM
+global DATA PARAM COVERAGE
 
 [PARAM(:).tab_dim] = zeros(PARAM.Nb_point,3) ;
 PARAM.tab_dim(:,3) = PARAM.max_pedal_angle ; 
@@ -105,6 +105,9 @@ disp('- plot global coverage and show its value ')
 coverage = compute_global_coverage(DATA.(valeurs), PARAM) ;
 % Disp value of coverage in the panel 
 set(handles.TXT_global_coverage, 'String', coverage)
+
+axes(handles.GRAPH_coverage)
+plot(COVERAGE)
 
 disp('- Set parameter of panel "choose signal parameters"')
 % Set the number of projection dimension possible 

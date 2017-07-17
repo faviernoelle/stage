@@ -21,7 +21,7 @@ load parametre
 % load all_exp
 load cl0
 
-global DATA PARAM
+global DATA PARAM COVERAGE 
 DATA = struct('exp', Out) ; 
 
 % DATA = data ;
