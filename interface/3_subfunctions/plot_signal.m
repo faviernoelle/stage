@@ -118,7 +118,7 @@ if strcmpi(get(gcf,'SelectionType'), 'Normal')
     
     % global variable to test if a point has been found and to get the line
     % to plot the signal corresponding to the point
-    global LINE
+    global LINE VALEURS
     
     
     
@@ -174,6 +174,8 @@ if strcmpi(get(gcf,'SelectionType'), 'Normal')
              % signal to plot = values of the signal and last value of this
              % signal to have a signal complete from 1 to N+1  
              CONSIGNE = [u_x u_x(end)] ; 
+             
+             VALEURS = VALUES ;
              
              % call the function to plot the signal and its robustness 
              % value and to be able to test this signal in simulation 
@@ -241,7 +243,7 @@ elseif strcmpi(get(gcf,'SelectionType'), 'Alt')
         
         cbs_reinit 
         
-        global CBS start VALEURS
+        global CBS start
         
         
         start = 1 ;
