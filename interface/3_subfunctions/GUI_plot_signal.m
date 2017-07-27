@@ -70,7 +70,7 @@ axis([1 length(CONSIGNE(1,:)) 0 40])
 
 [~, ~, value] = get_min_rob(VALEURS) ;
 
-set(handles.TXT_robu_value,'String',num2str(value))
+set(handles.TXT_robu_value,'String',num2str(value(1)))
 % set(handles.TXT_robu_value,'String',num2str(VALUES.clusters{COLUMN}.vals(LINE)))
 
 % if POINT_SELECTED == 1

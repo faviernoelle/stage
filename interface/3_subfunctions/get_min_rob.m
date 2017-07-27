@@ -8,8 +8,10 @@ function [region, line, value] = get_min_rob(Out)
 % Highest value of robustness 
 rob = 1 ; 
 
+
 % For each rectangle
 for i = 1 : numel(Out.regions) 
+
     % For each signal
     for j=1 : length(Out.clusters{i}.vals)
         % If the value of robustness is lower than the previous lowest
@@ -23,7 +25,7 @@ for i = 1 : numel(Out.regions)
             value = rob ;
         end
     end
+    
 end
-
 
 

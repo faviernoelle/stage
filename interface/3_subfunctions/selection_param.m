@@ -22,7 +22,7 @@ function varargout = selection_param(varargin)
 
 % Edit the above text to modify the response to help selection_param
 
-% Last Modified by GUIDE v2.5 11-Jul-2017 15:06:53
+% Last Modified by GUIDE v2.5 26-Jul-2017 18:05:14
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -128,18 +128,14 @@ fprintf('\n Limit on number of simulations during global search is %d.\n',...
 fprintf('\n Threshold number of samples for classification is %d\n ',...
     get(handles.SLID_min_sample,'Value'))
 
-global start n
-start = 1 ;
-n = 0 ;
 
-set(handles.BUT_start,'Visible','On')
-set(handles.BUT_stop,'Visible','Off')
-set(handles.BUT_visu,'Visible','Off')
+global W_ROB MIN_SAMPLE MAX_SIMU MAX_TIME 
+W_ROB = handles.SLID_rob_wt.Value ;
+MIN_SAMPLE = handles.SLID_max_simu.Value ;
+MAX_SIMU = handles.SLID_min_sample.Value ;
+MAX_TIME = handles.SLID_max_time.Value ;
 
 
-set(handles.BUT_start,'String','Start simulation')
-
-set(handles.MENU_New,'Visible','Off')
 
 % Choose default command line output for selection_param
 handles.output = hObject;
@@ -401,3 +397,48 @@ function MENU_Close_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 close selection_param
 
+
+% --- Executes on selection change in POPUP_fals_method.
+function POPUP_fals_method_Callback(hObject, eventdata, handles)
+% hObject    handle to POPUP_fals_method (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns POPUP_fals_method contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from POPUP_fals_method
+
+
+% --- Executes during object creation, after setting all properties.
+function POPUP_fals_method_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to POPUP_fals_method (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on selection change in POPUP_seed.
+function POPUP_seed_Callback(hObject, eventdata, handles)
+% hObject    handle to POPUP_seed (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns POPUP_seed contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from POPUP_seed
+
+
+% --- Executes during object creation, after setting all properties.
+function POPUP_seed_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to POPUP_seed (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end

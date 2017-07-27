@@ -18,13 +18,22 @@ addPath
 
 load parametre
 
-% load all_exp
-load cl0
+global DATA
 
-global DATA PARAM COVERAGE 
-DATA = struct('exp', Out) ; 
+% load Experience1
+% DATA = struct('exp',Out_exp1) ;
+% load Experience2
+% DATA = struct('exp',Out_exp2) ;
+% load Experience3
+% DATA = struct('exp',Out_exp3) ;
+% load Experience4
+% DATA = struct('exp',Out_exp4) ;
+load exp_compl
+DATA = struct('exp', Out) ;
+% load cl0
 
-% DATA = data ;
+global PARAM 
+% global COVERAGE 
 
 % PARAM.tab_dim(1,3) = 20 ;
 PARAM.Nb_point = 10 ;
@@ -36,11 +45,11 @@ GUI_interactive_graph
 % figure()
 % plot_rectangles(DATA.exp, 1, 2, 2)
 
-% plot_signal(DATA.exp, 1, 2, 1, PARAM)
+% plot_signal(DATA.Exp1, 1, 2, 1, PARAM)
 
 % coverage = compute_global_coverage(DATA.Exp1, PARAM) ;
 
-% region = get_min_rob(DATA.Exp1) 
+% [rank, line, value] = get_min_rob(DATA.Exp3) 
 
 % figure()
 % plot_new_rectangles(DATA.Exp3, 1, 5, 5, PARAM)

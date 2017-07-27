@@ -53,7 +53,11 @@ scatter(x,y,[],c)
 xlabel(['Projection dimension ', num2str(COLONE1)])
 ylabel(['Projection dimension ', num2str(COLONE2)])
 
-axis([limite_x limite_y])
+bounds_x = [Out.regions{COLUMN}(COLONE1,1) Out.regions{COLUMN}(COLONE1,2)] ;
+bounds_y = [Out.regions{COLUMN}(COLONE2,1) Out.regions{COLUMN}(COLONE2,2)] ;
+
+
+axis([bounds_x bounds_y])
 
 title(['Points in rectangle ' num2str(COLUMN) ' for x = ' num2str(i) ', y = ' num2str(j) ])
 

@@ -4,7 +4,7 @@ addPath
 
 bdclose all
 close all
-clear vars
+% clear vars
 InitBreach
 
 
@@ -134,9 +134,7 @@ switch a
          
 %          fprintf('\n Press any key to continue\n')
 %          pause
-        
-
-            selection_param
+       
         %         time_lim = 2000;
         snap_grid = 'y';
         switch snap_grid

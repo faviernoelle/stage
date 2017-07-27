@@ -22,7 +22,7 @@ function varargout = GUI_interactive_graph(varargin)
 
 % Edit the above text to modify the response to help GUI_interactive_graph
 
-% Last Modified by GUIDE v2.5 06-Jul-2017 10:35:14
+% Last Modified by GUIDE v2.5 26-Jul-2017 18:28:03
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -52,8 +52,18 @@ function GUI_interactive_graph_OpeningFcn(hObject, eventdata, handles, varargin)
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to GUI_interactive_graph (see VARARGIN)
 
-
+global first_simu
+first_simu = 1 ;
+global start n
+start = 1 ;
+n = 0 ;
+global W_ROB MIN_SAMPLE MAX_SIMU MAX_TIME 
+W_ROB = 0.5 ; 
+MIN_SAMPLE = 10 ; 
+MAX_SIMU = 200 ; 
+MAX_TIME = 2000 ;
 cla(handles.GRAPH_graph1) 
+
 
 % Informing the user
 disp('-------------------------------------------------------------------------------------')
@@ -67,17 +77,10 @@ addPath % Adding to path all subfolders of the project
 disp('- Set properties of objects')
 
 global DATA PARAM COVERAGE
-
+ 
 [PARAM(:).tab_dim] = zeros(PARAM.Nb_point,3) ;
 PARAM.tab_dim(:,3) = PARAM.max_pedal_angle ; 
 PARAM.tab_dim(:,1) = 1:PARAM.Nb_point ;
-
-% Getting the name of the differents data to post
-name_fields = fieldnames(DATA) ;
-valeurs = name_fields{handles.POPUP_Name_data.Value} ;
-
-% Set Structure name
-set(handles.POPUP_Name_data, 'String', name_fields)
 
 % Adding images
 disp('- Adding images')
@@ -91,94 +94,29 @@ imshow('toyota.PNG')
 disp('- Clear rectangle graph')
 cla(handles.GRAPH_graph1) % clear graph on the right
 
+set(handles.TXT_rect_selected,'Visible','Off')
 
-disp('- Plot the rectangle containing the point with the lowest robustness')
-% Get rectangle containing the point of minimal robustness
-region = get_min_rob(DATA.(valeurs)) ;
-% Select the rectangle containing the point with the lowest robustness
-set(handles.POPUP_rectangle, 'Value', region)
-column = handles.POPUP_rectangle.Value ;
+if ~isempty(DATA)
+    set_param(hObject,eventdata,handles)
+end 
 
-disp('- plot global coverage and show its value ')
-% Compute global coverage value (call function compute_global_coverage)
-% See help compute_global_coverage to get more details
-coverage = compute_global_coverage(DATA.(valeurs), PARAM) ;
-% Disp value of coverage in the panel 
-set(handles.TXT_global_coverage, 'String', coverage)
 
-axes(handles.GRAPH_coverage)
-plot(COVERAGE)
-
-disp('- Set parameter of panel "choose signal parameters"')
-% Set the number of projection dimension possible 
-set(handles.SLID_Pi, 'Min', 1) ;
-set(handles.SLID_Pi, 'Max', numel(DATA.(valeurs).clusters{1}.pts(1,:))) ;
-set(handles.SLID_Pj, 'Min', 1) ;
-set(handles.SLID_Pj, 'Max', numel(DATA.(valeurs).clusters{1}.pts(1,:))) ;
-% Set value of x to 1
-set(handles.SLID_Pi, 'Value', 1) ;
-% Set the value of y on 2 to be able to plot things without changing
-% anything
-set(handles.SLID_Pj, 'Value', 2) ;
-% Get x(Pi) and y(Pj) values
-x = floor(handles.SLID_Pi.Value) ;
-y = floor(handles.SLID_Pj.Value) ;
-% Writte on the text box under the slider the min, max and current values 
-% of the slider for Pi value
-set(handles.TXT_Pi_min,   'String', num2str(1)) ;
-set(handles.TXT_Pi_max,   'String', num2str(numel(DATA.(valeurs).clusters{1}.pts(1,:)))) ;
-set(handles.TXT_Pi_value, 'String', num2str(handles.SLID_Pi.Value(1))) ;
-% Writte on the text box under the slider the min, max and current values 
-% of the slider for Pj value
-set(handles.TXT_Pj_min,   'String', num2str(1)) ;
-set(handles.TXT_Pj_max,   'String', num2str(numel(DATA.(valeurs).clusters{1}.pts(1,:)))) ;
-set(handles.TXT_Pj_value, 'String', num2str(handles.SLID_Pj.Value(1))) ;
-% Select data to set intervale of the sliders
-sliderMin = get(handles.SLID_Pi, 'Min') ;
-sliderMax = get(handles.SLID_Pi, 'Max') ;
-SliderStep = [1 1] / (sliderMax - sliderMin) ;
-% Set interval of the slider for Pi and for Pj
-% Each time the user presses an arrow key or clicks in the troug the value
-% of the slidbar is increased of 1
-set(handles.SLID_Pi, 'SliderStep', SliderStep)  ;
-set(handles.SLID_Pj, 'SliderStep', SliderStep)  ;
-
-disp('- Set parameter in panel "Plot rectangles" ')
-% Set the popup menu with the number of rectangles
-set(handles.POPUP_rectangle, 'String', num2str((1:1:numel(DATA.(valeurs).regions))'));
-% Write the size of selected rectangle in the panel 'choose rectangle to
-% plot'
-set(handles.TXT_size_rect_x, 'String',...
-    ['Size/x = ' num2str(DATA.(valeurs).regions{column}(x,:))])
-set(handles.TXT_size_rect_y, 'String',...
-    ['Size/y = ' num2str(DATA.(valeurs).regions{column}(y,:))])
-set(handles.TXT_coverage, 'String',...
-    ['local coverage = ' num2str(DATA.(valeurs).coverage(column))])
-axes(handles.GRAPH_graph1)
-plot_new_rectangles(DATA.(valeurs), x, y, column, PARAM)
-
-disp('- Set parameter in panel "add limits on projection dimensions" ')
-% Set parameter in panel 'add limits on projection dimensions'
-set(handles.POPUP_dim, 'String', num2str((1:PARAM.Nb_point)'))
-
-disp('- Reset the limits on dimensions')
-% Reset the limits on dimensions
-set(handles.LIST_dim, 'String', [])
+% Set properties of the graph on the left
+disp('- Set properties of the graph on the left')
+% set(handles.GRAPH_graph1,'ButtonDownFcn',{@MouseClicking handles});
+% set(handles.GRAPH_graph1,'ButtonDownFcn',{@Test handles});
+set(hObject,'WindowButtonDownFcn',{@MouseClicking handles})
 
 disp('End initialization')
-disp('-------------------------------------------------------------------------------------')
-
-set(handles.POPUP_rectangle,'Value',1);
-
 
 % Choose default command line output for GUI_interactive_graph
 handles.output = hObject;
 
 % Update handles structure
 guidata(hObject, handles);
-
 % UIWAIT makes GUI_interactive_graph wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
+
 
 
 % --- Outputs from this function are returned to the command line.
@@ -192,296 +130,166 @@ function varargout = GUI_interactive_graph_OutputFcn(hObject, eventdata, handles
 varargout{1} = handles.output;
 
 
+function CellEditCallback(hObject, eventdata, handles)
+% disp('changes on the table')
 
-% --- Executes on selection change in POPUP_Name_data.
-function POPUP_Name_data_Callback(hObject, eventdata, handles)
-% hObject    handle to POPUP_Name_data (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-% Hints: contents = cellstr(get(hObject,'String')) returns POPUP_Name_data contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from POPUP_Name_data
-% Set parameter of every panels
-global DATA PARAM
-name_fields = fieldnames(DATA) ;
-valeurs = name_fields{handles.POPUP_Name_data.Value} ;
-disp('-------------------------------------------------------------------------------------')
-disp('Data loaded')
-disp('-------------------------------------------------------------------------------------')
+global PARAM DATA
 
-% Set the popup menu with the number of rectangles
-set(handles.POPUP_rectangle, 'String', num2str((1:1:numel(DATA.(valeurs).regions))'));
-
-disp('Clear rectangle graph')
-cla(handles.GRAPH_graph1) % clear graph on the right
-
-disp('Plot the rectangle containing the point with the lowest robustness')
-% Get rectangle containing the point of minimal robustness
-region = get_min_rob(DATA.(valeurs)) ;
-% Select the rectangle containing the point with the lowest robustness
-set(handles.POPUP_rectangle, 'Value', region)
-column = handles.POPUP_rectangle.Value ;
-
-disp('plot global coverage and show its value ')
-% Compute global coverage value (call function compute_global_coverage)
-% See help compute_global_coverage to get more details
-coverage = compute_global_coverage(DATA.(valeurs), PARAM) ;
-% Disp value of coverage in the panel 
-set(handles.TXT_global_coverage, 'String', coverage)
-
-disp('Set parameter of panel "choose signal parameters"')
-% Set the number of projection dimension possible 
-set(handles.SLID_Pi, 'Min', 1) ;
-set(handles.SLID_Pi, 'Max', numel(DATA.(valeurs).clusters{1}.pts(1,:))) ;
-set(handles.SLID_Pj, 'Min', 1) ;
-set(handles.SLID_Pj, 'Max', numel(DATA.(valeurs).clusters{1}.pts(1,:))) ;
-% Set value of x to 1
-set(handles.SLID_Pi, 'Value', 1) ;
-% Set the value of y on 2 to be able to plot things without changing
-% anything
-set(handles.SLID_Pj, 'Value', 2) ;
-% Get x(Pi) and y(Pj) values
-x = floor(handles.SLID_Pi.Value) ;
-y = floor(handles.SLID_Pj.Value) ;
-% Writte on the text box under the slider the min, max and current values 
-% of the slider for Pi value
-set(handles.TXT_Pi_min,   'String', num2str(1)) ;
-set(handles.TXT_Pi_max,   'String', num2str(numel(DATA.(valeurs).clusters{1}.pts(1,:)))) ;
-set(handles.TXT_Pi_value, 'String', num2str(handles.SLID_Pi.Value(1))) ;
-% Writte on the text box under the slider the min, max and current values 
-% of the slider for Pj value
-set(handles.TXT_Pj_min,   'String', num2str(1)) ;
-set(handles.TXT_Pj_max,   'String', num2str(numel(DATA.(valeurs).clusters{1}.pts(1,:)))) ;
-set(handles.TXT_Pj_value, 'String', num2str(handles.SLID_Pj.Value(1))) ;
-% Select data to set intervale of the sliders
-sliderMin = get(handles.SLID_Pi, 'Min') ;
-sliderMax = get(handles.SLID_Pi, 'Max') ;
-SliderStep = [1 1] / (sliderMax - sliderMin) ;
-% Set interval of the slider for Pi and for Pj
-% Each time the user presses an arrow key or clicks in the troug the value
-% of the slidbar is increased of 1
-set(handles.SLID_Pi, 'SliderStep', SliderStep)  ;
-set(handles.SLID_Pj, 'SliderStep', SliderStep)  ;
-
-disp('Set parameter in panel "Plot rectangles" ')
-% Write the size of selected rectangle in the panel 'choose rectangle to
-% plot'
-set(handles.TXT_size_rect_x, 'String',...
-    ['Size/x = ' num2str(DATA.(valeurs).regions{column}(x,:))])
-set(handles.TXT_size_rect_y, 'String',...
-    ['Size/y = ' num2str(DATA.(valeurs).regions{column}(y,:))])
-set(handles.TXT_coverage, 'String',...
-    ['local coverage = ' num2str(DATA.(valeurs).coverage(column))])
 axes(handles.GRAPH_graph1)
-plot_new_rectangles(DATA.(valeurs), x, y, column, PARAM)
+cla %clear axe on the right
 
-disp('Set parameter in panel "add limits on projection dimensions" ')
-% Set parameter in panel 'add limits on projection dimensions'
-set(handles.POPUP_dim, 'String', num2str((1:numel(DATA.(valeurs).clusters{column}.pts(1,:)))'))
+data = handles.select_dim_and_limits.Data ;
 
-disp('Reset the limits on dimensions')
-% Reset the limits on dimensions
-set(handles.LIST_dim, 'String', [])
-
-PARAM.tab_dim = zeros(10,3) ;
-PARAM.tab_dim(:,3) = PARAM.max_pedal_angle ; 
-PARAM.tab_dim(:,1) = 1:length(handles.POPUP_dim.String) ;
-
-
-% --- Executes during object creation, after setting all properties.
-function POPUP_Name_data_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to POPUP_Name_data (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
+test_x = zeros(10,1) ;
+for i= 1:PARAM.Nb_point
+    test_x(i) = data{i,2} ;
 end
 
+x = find(test_x == 1) ;
+y = find(test_x == 2) ;
 
-% --- Executes on button press in BUT_load_data.
-function BUT_load_data_Callback(hObject, eventdata, handles)
-% hObject    handle to BUT_load_data (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
-% --- Executes on slider movement.
-function SLID_Pi_Callback(hObject, eventdata, handles)
-% hObject    handle to SLID_Pi (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'Value') returns position of slider
-%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
-
-% modify the textbox showing the value of the slider
-set(handles.TXT_Pi_value, 'String', num2str(floor(handles.SLID_Pi.Value(1)))) ;
-
-
-% --- Executes during object creation, after setting all properties.
-function SLID_Pi_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to SLID_Pi (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: slider controls usually have a light gray background.
-if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor',[.9 .9 .9]);
+for i=1:PARAM.Nb_point 
+    PARAM.tab_dim(i,2) = handles.select_dim_and_limits.Data{i,5} ;
+    PARAM.tab_dim(i,3) = handles.select_dim_and_limits.Data{i,6} ;
 end
 
-
-% --- Executes on slider movement.
-function SLID_Pj_Callback(hObject, eventdata, handles)
-% hObject    handle to SLID_Pj (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'Value') returns position of slider
-%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
-
-% modify the textbox showing the value of the slider
-set(handles.TXT_Pj_value, 'String', num2str(floor(handles.SLID_Pj.Value(1)))) ;
-
-
-% --- Executes during object creation, after setting all properties.
-function SLID_Pj_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to SLID_Pj (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: slider controls usually have a light gray background.
-if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor',[.9 .9 .9]);
-end
-
-
-% --- Executes on button press in BUT_plot_rectangles.
-function BUT_plot_rectangles_Callback(hObject, eventdata, handles)
-
-global DATA PARAM
-
-% hObject    handle to BUT_plot_rectangles (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-x = floor(handles.SLID_Pi.Value) ;
-y = floor(handles.SLID_Pj.Value) ;
-
-% Get the name of the fields contained in DATA
-name_fields = fieldnames(DATA) ;
-valeurs = name_fields{handles.POPUP_Name_data.Value} ;
-
-% Get rectangle containing the point of minimal robustness
-region = get_min_rob(DATA.(valeurs)) ;
-
-% Select the rectangle containing the point with the lowest robustness
-set(handles.POPUP_rectangle, 'Value', region)
-
-% get the value of the pop_up to choose the rectangle
-column = handles.POPUP_rectangle.Value ; 
- 
-cla(handles.GRAPH_graph1)  %clear axes
-
-% Write the size of selected rectangle in the panel 'choose rectangle to
-% plot'
-set(handles.TXT_size_rect_x, 'String',...
-    ['Size/x = ' num2str(DATA.(valeurs).regions{column}(x,:))])
-set(handles.TXT_size_rect_y, 'String',...
-    ['Size/y = ' num2str(DATA.(valeurs).regions{column}(y,:))])
-set(handles.TXT_coverage, 'String',...
-    ['local coverage = ' num2str(DATA.(valeurs).coverage(column))])
-
-% Plot in the graph on the left the rectangles in projection dimension
-% selected and color each point according to the value of its robustness
-% To have more details tape 'help plot_rectangles_and_colore_selected_one'
 axes(handles.GRAPH_graph1)
-plot_new_rectangles(DATA.(valeurs), x, y, column, PARAM)
-
-disp('Plot rectangles')
-disp('-------------------------------------------------------------------------------------')
+plot_new_rectangles(DATA.exp, x, y, 1, PARAM) 
 
 
-% --- Executes on selection change in POPUP_rectangle.
-function POPUP_rectangle_Callback(hObject, eventdata, handles)
-% hObject    handle to POPUP_rectangle (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+function CellSelectionCallback(hObject, eventdata, handles)
+% disp('column selected')
 
-% Hints: contents = cellstr(get(hObject,'String')) returns POPUP_rectangle contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from POPUP_rectangle
+axes(handles.GRAPH_graph1)
+cla % clear axe on the right
 
-cla(handles.GRAPH_graph1)  % clear axes
+global PARAM DATA
 
-global DATA PARAM
+data1 = handles.select_rect_to_plot.Data ;
+data2 = handles.select_dim_and_limits.Data ;
 
-% recover x and y you wnat to plot
-x = floor(handles.SLID_Pi.Value) ;
-y = floor(handles.SLID_Pj.Value) ;
-
-% Recover the zone you want to plot
-column = handles.POPUP_rectangle.Value ; 
-
-name_fields = fieldnames(DATA) ;
-valeurs = name_fields{handles.POPUP_Name_data.Value} ;
-
-% Write the size of selected rectangle and its coverage value in the panel 
-% choose rectangle to plot
-set(handles.TXT_size_rect_x, 'String',...
-    ['Size/x = ' num2str(DATA.(valeurs).regions{column}(x,:))])
-set(handles.TXT_size_rect_y, 'String',...
-    ['Size/y = ' num2str(DATA.(valeurs).regions{column}(y,:))])
-set(handles.TXT_coverage, 'String',...
-    ['local coverage = ' num2str(DATA.(valeurs).coverage(column))])
-
-% Plot rectangle in the graph on the right and color the border of the
-% selected one and the points inside it
-plot_new_rectangles(DATA.(valeurs), x, y, column, PARAM)
-disp(PARAM.tab_dim)
-
-
-% --- Executes during object creation, after setting all properties.
-function POPUP_rectangle_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to POPUP_rectangle (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
+test_x = zeros(10,1) ;
+for i= 1:PARAM.Nb_point
+    test_x(i) = data2{i,2} ;
 end
 
+x = find(test_x == 1) ;
+y = find(test_x == 2) ;
 
 
-% --- Executes on button press in BUT_robustness.
-function BUT_robustness_Callback(hObject, eventdata, handles)
-% hObject    handle to BUT_robustness (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+Cellule = eventdata.Indices;
+if isempty(Cellule)
+    Cellule= [1 1] ;
+end
+rectangle_to_plot = data1(Cellule(1), 1) ;
 
+disp(['rectangle sélectionné : ', num2str(rectangle_to_plot)])
+
+set(handles.TXT_rect_selected,'String',rectangle_to_plot) ;
+
+plot_new_rectangles(DATA.exp, x, y, rectangle_to_plot, PARAM)
+
+
+function MouseClicking(~, eventdata, handles)
+
+% function which act when the click is used :
+% When we do a left click in every case disp (left click) and
+    % if it's on a point -> plot robustness value
+    % if it's not on a point -> do nothing
+% left click clear texts on the figure
+    
 global DATA PARAM
 
-% recover x and y you wnat to plot
-x = floor(handles.SLID_Pi.Value) ;
-y = floor(handles.SLID_Pj.Value) ;
 
-% Recover the zone you want to plot
-column = handles.POPUP_rectangle.Value ; 
+data2 = handles.select_dim_and_limits.Data ;
 
-% Get the name of the fields contained in DATA
-name_fields = fieldnames(DATA) ;
-valeurs = name_fields{handles.POPUP_Name_data.Value} ;
+test_x = zeros(10,1) ;
+for i= 1:PARAM.Nb_point
+    test_x(i) = data2{i,2} ;
+end
 
-% call of the function to plot the x and y selected 
-% to have more detail tape 'help plot_robustness'
-plot_robustness(DATA.(valeurs), x, y, column, PARAM)
+x = find(test_x == 1) ;
+y = find(test_x == 2) ;
 
-disp('Open new graph ')
-disp('Use left click on the points to get their robustness value and their position')
-disp('Use right click to delete all the texts on the figure')
-disp('-------------------------------------------------------------------------------------')
+
+rectangle_to_plot = str2double(get(handles.TXT_rect_selected,'String')) ;
+
+% Left click
+if strcmpi(get(gcf,'SelectionType'), 'Normal')
+
+% set value epsilon such that if the mouse is to far away from the point do
+% nothing 
+    epsilon = 0.5 ;
+    [PARAM(:).epsilon] = epsilon ;
+    
+    actual_fewest_dist = 1 ;
+    
+    line = 0 ;
+   
+    pointeur_x = handles.GRAPH_graph1.CurrentPoint(1,1) ;
+    pointeur_y = handles.GRAPH_graph1.CurrentPoint(1,2) ;
+    
+    % for every point test the distance between the value X of the point
+    % and the value X of the mouse and the same for Y and if both values
+    % are smaller than epsilon write on the graph the robustness value of
+    % the point
+    for l=1:length(DATA.exp.clusters{rectangle_to_plot}.pts)
+        % test the difference between position of the point and position of
+        % the mouse
+        % Define a cercle of radius epsilon arround the point such that if the 
+        % mouse is in this cercle the values of the point are written 
+        % otherwise they are not written
+        dist =  (pointeur_y - DATA.exp.clusters{rectangle_to_plot}.pts(l,y)) * ...
+                (pointeur_y - DATA.exp.clusters{rectangle_to_plot}.pts(l,y)) + ...
+                (pointeur_x - DATA.exp.clusters{rectangle_to_plot}.pts(l,x)) * ...
+                (pointeur_x - DATA.exp.clusters{rectangle_to_plot}.pts(l,x)) ;
+        
+        
+        if sqrt(dist) < PARAM.epsilon
+             
+            if dist < actual_fewest_dist
+                actual_fewest_dist = dist ; 
+                line = l ; 
+            end
+            
+            
+            % Part of the code to get the parameters to put the texts at the right position
+            min = DATA.exp.regions{rectangle_to_plot}(y,1);
+            max = DATA.exp.regions{rectangle_to_plot}(y,2);
+            
+            affich_text_robu = 3/40 ; % parameter calculed to optimize visualization
+            [PARAM(:).affich_text_robu] = affich_text_robu ;
+            delta = (max-min)*(PARAM.affich_text_robu) ;
+
+        else
+            % Do nothing
+        end
+    end
+    
+    if line ~= 0
+        % Write robustness value on the graph, the first two values are
+        % used to define the position where the text will be written
+        % Writte robustness
+        text(DATA.exp.clusters{rectangle_to_plot}.pts(line,x),...
+            DATA.exp.clusters{rectangle_to_plot}.pts(line,y), ...
+        num2str(DATA.exp.clusters{rectangle_to_plot}.vals(line)))
+        % Writte position /x
+        text(DATA.exp.clusters{rectangle_to_plot}.pts(line,x),...
+            DATA.exp.clusters{rectangle_to_plot}.pts(line,y)-delta, ...
+            ['x = ' num2str(DATA.exp.clusters{rectangle_to_plot}.pts(line,x))]); 
+        % Writte position /y
+        text(DATA.exp.clusters{rectangle_to_plot}.pts(line,x),...
+            DATA.exp.clusters{rectangle_to_plot}.pts(line,y)-2*delta, ...    
+            ['y = ' num2str(DATA.exp.clusters{rectangle_to_plot}.pts(line,y))]);
+    else 
+        % Do nothing
+    end
+    
+% Right click
+elseif strcmpi(get(gcf,'SelectionType'), 'Alt')
+    allText = findobj(gca,'Type','Text') ;
+    delete(allText)
+end
 
 
 % --- Executes on button press in BUT_plot_signal.
@@ -490,249 +298,21 @@ function BUT_plot_signal_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-global DATA PARAM
+global PARAM DATA 
 
-% recover x and y you wnat to plot
-x = floor(handles.SLID_Pi.Value) ;
-y = floor(handles.SLID_Pj.Value) ;
+data2 = handles.select_dim_and_limits.Data ;
 
-% Recover the zone you want to plot
-column = handles.POPUP_rectangle.Value ; 
-
-% Get the name of the fields contained in DATA
-name_fields = fieldnames(DATA) ;
-valeurs = name_fields{handles.POPUP_Name_data.Value} ;
-
-disp('Plot signal')
-plot_signal(DATA.(valeurs), x, y, column, PARAM)
-
-disp('Open new graph ')
-disp('Use left click on the points to plot their signal')
-disp('Use right click not on a point to plot a new signal')
-disp('-------------------------------------------------------------------------------------')
-
-
-% --- Executes on selection change in POPUP_dim.
-function POPUP_dim_Callback(hObject, eventdata, handles)
-% hObject    handle to POPUP_dim (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: contents = cellstr(get(hObject,'String')) returns POPUP_dim contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from POPUP_dim
-
-global PARAM
-
-set(handles.EDIT_min_range,'String',0)
-set(handles.EDIT_max_range,'String',PARAM.max_pedal_angle)
-
-
-% --- Executes during object creation, after setting all properties.
-function POPUP_dim_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to POPUP_dim (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
+test_x = zeros(10,1) ;
+for i= 1:PARAM.Nb_point
+ test_x(i) = data2{i,2} ;
 end
 
-function EDIT_min_range_Callback(hObject, eventdata, handles)
-% hObject    handle to EDIT_min_range (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+x = find(test_x == 1) ;
+y = find(test_x == 2) ;
 
-% Hints: get(hObject,'String') returns contents of EDIT_min_range as text
-%        str2double(get(hObject,'String')) returns contents of EDIT_min_range as a double
-% Set parameters of the table
-handles.listbox2.String = get(handles.POPUP_dim,'Value') ;
-% handles.listbox2.UserData(1,2) = num2str(handles.EDIT_min_range.Value) ;
-% handles.listbox2.UserData(1,3) = num2str(handles.EDIT_max_range.Value) ;
+rectangle_to_plot = str2double(get(handles.TXT_rect_selected,'String')) ;
 
-
-% --- Executes during object creation, after setting all properties.
-function EDIT_min_range_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to EDIT_min_range (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-function EDIT_max_range_Callback(hObject, eventdata, handles)
-% hObject    handle to EDIT_max_range (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of EDIT_max_range as text
-%        str2double(get(hObject,'String')) returns contents of EDIT_max_range as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function EDIT_max_range_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to EDIT_max_range (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-% --- Executes on button press in BUT_new_rect.
-function BUT_new_rect_Callback(hObject, eventdata, handles)
-% hObject    handle to BUT_new_rect (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-axes(handles.GRAPH_graph1)
-cla % clear axe
-
-global PARAM DATA
-
-% recover x and y and the rectangle you wnat to plot
-x = floor(handles.SLID_Pi.Value) ;
-y = floor(handles.SLID_Pj.Value) ;
-column = handles.POPUP_rectangle.Value ;
-
-% Get the name of the fields contained in DATA
-name_fields = fieldnames(DATA) ;
-valeurs = name_fields{handles.POPUP_Name_data.Value} ;
-
-plot_new_rectangles(DATA.(valeurs),x, y,column, PARAM)
-disp('Plot limited rectangles')
-
-
-% --- Executes on button press in BUT_limit.
-function BUT_limit_Callback(hObject, eventdata, handles)
-% hObject    handle to BUT_limit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-global PARAM
-
-val = handles.POPUP_dim.Value ;
-a = num2str(val) ;
-
-
-old_str = get(handles.LIST_dim, 'String') ;
-
-if isempty(old_str)
-    N = 0 ;
-else
-    N = numel(old_str(:,1)) ;
-end
-
-for i=1:N
-    if val == str2double(old_str(i,:))
-        old_str(i,:) = [] ;
-        break
-    end
-end
-
-str_part = a ;
-
-new_str = strvcat(old_str, str_part) ;
-set(handles.LIST_dim, 'String', new_str)
-
-PARAM.tab_dim(val,2) = str2double(handles.EDIT_min_range.String) ;
-PARAM.tab_dim(val,3) = str2double(handles.EDIT_max_range.String) ;
-
-disp('Affichage des limites')
-disp(PARAM.tab_dim)
-
-handles.TXT_min_range.String{1} = handles.EDIT_min_range.String ;
-handles.TXT_max_range.String{1} = handles.EDIT_max_range.String ;
-nb_elem = numel(handles.LIST_dim.String(:,1)) ;
-
-set(handles.LIST_dim, 'Value', nb_elem)
-
-
-% --- Executes on selection change in LIST_dim.
-function LIST_dim_Callback(hObject, eventdata, handles)
-% hObject    handle to LIST_dim (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: contents = cellstr(get(hObject,'String')) returns LIST_dim contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from LIST_dim
-
-% Get the dimension selected
-current_str = get(handles.LIST_dim, 'String') ;
-to_plot = str2double(current_str(handles.LIST_dim.Value,:)) ;
-
-global PARAM 
-
-% write limits on dimension selected
-handles.TXT_min_range.String{1} = PARAM.tab_dim(to_plot,2) ;
-handles.TXT_max_range.String{1} = PARAM.tab_dim(to_plot,3) ;
-
-% --- Executes during object creation, after setting all properties.
-function LIST_dim_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to LIST_dim (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: listbox controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-% --- Executes on button press in BUT_reset_lim.
-function BUT_reset_lim_Callback(hObject, eventdata, handles)
-% hObject    handle to BUT_reset_lim (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% reset listbox
-set(handles.LIST_dim, 'String', [])
-
-% reset table containing the limits
-global PARAM
-PARAM.tab_dim = zeros(PARAM.Nb_point,3) ;
-PARAM.tab_dim(:,3) = PARAM.max_pedal_angle ; 
-PARAM.tab_dim(:,1) = 1:PARAM.Nb_point ;
-
-set(handles.LIST_dim, 'Value', 1)
-set(handles.POPUP_dim, 'Value', 1)
-set(handles.EDIT_min_range, 'String', 0)
-set(handles.EDIT_max_range, 'String', 40)
-set(handles.TXT_min_range, 'String', 0)
-set(handles.TXT_max_range, 'String', 40)
-
-
-% --- Executes on button press in BUT_suppr_lim.
-function BUT_suppr_lim_Callback(hObject, eventdata, handles)
-% hObject    handle to BUT_suppr_lim (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-a = handles.LIST_dim.Value ;
-new_str = get(handles.LIST_dim, 'String') ;
-new_str(a,:)=[] ;
-
-set(handles.LIST_dim, 'Value', length(new_str(:,1))) 
-set(handles.LIST_dim, 'String', new_str)
-
-global PARAM
-PARAM.tab_dim(a,2) = 0 ;
-PARAM.tab_dim(a,3) = PARAM.max_pedal_angle ;
-
-% write on the textbox the value of the selected dimension
-current_str = get(handles.LIST_dim, 'String') ;
-to_plot = str2double(current_str(handles.LIST_dim.Value,:)) ;
-
-handles.TXT_min_range.String{1} = PARAM.tab_dim(to_plot,2) ;
-handles.TXT_max_range.String{1} = PARAM.tab_dim(to_plot,3) ;
+plot_signal(DATA.exp,x,y,rectangle_to_plot, PARAM)
 
 
 % --------------------------------------------------------------------
@@ -768,13 +348,14 @@ function MENU_Menu_Callback(hObject, ~, handles)
 
 
 % --------------------------------------------------------------------
-function MENU_open_Callback(hObject, eventdata, handles)
+function MENU_open_Callback(hObject, ~, handles)
 % hObject    handle to MENU_open (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 [filename, Pathname] = uigetfile ;
 addpath(Pathname)
 open(filename)
+set_param 
 
 
 % --------------------------------------------------------------------
@@ -788,3 +369,173 @@ bakCD = cd ;
 cd(Pathname) ;
 saveas(handles.figure1,Filename)
 cd(bakCD) ;
+
+
+% --- Executes on button press in BUT_start_simu.
+function BUT_start_simu_Callback(hObject, eventdata, handles)
+% hObject    handle to BUT_start_simu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+set(handles.BUT_stop_simu,'Visible','On')
+set(handles.BUT_start_simu,'Visible','Off')
+
+global first_simu Out DATA start COVERAGE n PARAM
+
+global r CBS phi
+
+global W_ROB MIN_SAMPLE MAX_SIMU MAX_TIME 
+
+w_rob = W_ROB ;
+init_sim = MIN_SAMPLE ;
+max_sim = MAX_SIMU ;
+time_lim = MAX_TIME ; 
+
+coverage = COVERAGE ;
+
+if first_simu ~= 1
+    cbs_reinit     
+else 
+    Out = [] ;
+    COVERAGE = [] ;
+
+    first_simu = 0 ;
+end
+
+% Lancer simulation
+disp('Lancer simu')
+
+rng(r,'twister');  
+timervar_1 = tic;
+
+
+start = 1 ;
+
+while n <= max_sim  && start == 1 
+    nb_before_calc_coverage = 20 ; 
+    Out = StatFalsify(Out, CBS, phi, w_rob, init_sim, ...
+        nb_before_calc_coverage, time_lim) ;
+    coverage = [coverage ; compute_global_coverage(Out, PARAM) ] ;
+    COVERAGE = coverage ;
+    n = Out.num_samples(1,1) ;
+end
+
+set(handles.BUT_start_simu,'Visible','On')
+
+DATA = struct('exp', Out) ;
+
+r = DATA.exp.num_samples(1) ;
+
+set_param(hObject,eventdata,handles)
+
+time_1 = toc(timervar_1);  
+fname = ['cl',num2str(r)];
+save(fname, 'Out')
+
+
+
+% --- Executes on button press in BUT_stop_simu.
+function BUT_stop_simu_Callback(hObject, eventdata, handles)
+% hObject    handle to BUT_stop_simu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global start;
+start = 0 ;
+
+function set_param(hObject, eventdata, handles)
+
+global DATA PARAM 
+
+disp('- Plot the rectangle containing the point with the lowest robustness')
+    % Get rectangle containing the point of minimal robustness
+    [rank_rob, ~, rob] = sort_robustness(DATA.exp) ;
+    [cov, rank_cov] = sort(DATA.exp.coverage) ;
+
+    disp('- plot global coverage and show its value ')
+    % Compute global coverage value (call function compute_global_coverage)
+    % See help compute_global_coverage to get more details
+    coverage = compute_global_coverage(DATA.exp, PARAM) ;
+    set(handles.TXT_global_coverage,'String',coverage)
+
+    % Column names and column format
+    columnname1 = {'Rectangle','Robustness rank','Coverage rank'} ;
+    columnformat1 = {'numeric','numeric','numeric'} ;
+
+    % Column names and column format
+    columnname2 = {'Dimension','Plot axis','Rect lower bound',...
+        'Rect uppur bound', 'Plot lower Bound', 'Plot upper bound'} ;
+    columnformat2 = {'numeric','numeric','numeric','numeric','numeric','numeric'} ;
+
+    % Define the data of the first table
+    d = (1:PARAM.Nb_point)' ;
+    for i=1:PARAM.Nb_point
+        data2(i,:) = {d(i) 0 0 PARAM.max_pedal_angle PARAM.tab_dim(i,2) PARAM.tab_dim(i,3)} ;   
+    end
+
+    d1 = 1:numel(DATA.exp.regions) ;
+    for i = 1:numel(DATA.exp.regions)
+        data1(i,:) = {d1(i) rank_rob(i) rank_cov(i)} ;
+    end
+
+    for j=1:3
+        for i=1:numel(DATA.exp.regions)
+            data_table(i,j) = data1{i,j} ;
+        end
+    end
+
+    data2{1,2} = 1 ;
+    data2{2,2} = 2 ;
+
+    % define the data of the second table
+
+    set(handles.select_dim_and_limits, 'ColumnName', columnname2)
+    set(handles.select_dim_and_limits, 'ColumnFormat', columnformat2)
+    set(handles.select_dim_and_limits, 'Data', data2)
+    set(handles.select_dim_and_limits, 'ColumnEditable',...
+        [false true false false true true] )
+    set(handles.select_dim_and_limits, 'CellEditCallback', ...
+        {@CellEditCallback handles})
+
+    set(handles.select_rect_to_plot, 'ColumnName', columnname1)
+    set(handles.select_rect_to_plot, 'ColumnFormat', columnformat1)
+    set(handles.select_rect_to_plot, 'Data', data_table)
+    set(handles.select_rect_to_plot, 'ColumnEditable',...
+        [false false false] )
+    set(handles.select_rect_to_plot, 'CellSelectionCallback', ...
+        {@CellSelectionCallback handles})
+
+    test_x = zeros(10,1) ;
+    for i= 1:PARAM.Nb_point
+        test_x(i) = data2{i,2} ;
+    end
+    % test_y(:) = data{:,2} ;
+
+    x = find(test_x == 1) ;
+    y = find(test_x == 2) ;
+
+    axes(handles.GRAPH_graph1)
+    plot_new_rectangles(DATA.exp, x, y, 1, PARAM) 
+
+    disp('- Hide static text for rectangle selected')
+    set(handles.TXT_rect_selected,'String',1) 
+    
+    % a faire : 
+    % Tracer la couverture
+
+
+% --------------------------------------------------------------------
+function MENU_Prop_Callback(hObject, eventdata, handles)
+% hObject    handle to MENU_Prop (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+selection_param
+if ~isempty(DATA)
+    set_param (hObject, eventdata, handles)
+end
+
+
+% --------------------------------------------------------------------
+function MENU_new_sim_Callback(hObject, eventdata, handles)
+% hObject    handle to MENU_new_sim (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)

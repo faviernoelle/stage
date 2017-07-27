@@ -15,5 +15,9 @@ global Out COVERAGE
 Out = [] ;
 COVERAGE = [] ;
 
+% load exp_compl
+% DATA = struct('exp', Out) ;
+
 Init
+GUI_interactive_graph
 
