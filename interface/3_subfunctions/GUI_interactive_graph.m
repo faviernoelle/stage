@@ -292,6 +292,43 @@ elseif strcmpi(get(gcf,'SelectionType'), 'Alt')
 end
 
 
+function BUT_cov_Callback(hObject, eventdata, handles)
+% hObject    handle to BUT_plot_signal (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+if handles.BUT_cov.Value  == 1
+    handles.BUT_rob.Value = 0 ;
+end
+
+data_old = handles.select_rect_to_plot.Data ;
+
+data = sort_table(data_old, 3) ;
+
+set(handles.select_rect_to_plot, 'Data', data)
+
+disp('classement par coverage')
+
+
+function BUT_rob_Callback(hObject, eventdata, handles)
+% hObject    handle to BUT_plot_signal (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+if handles.BUT_rob.Value  == 1
+    handles.BUT_cov.Value = 0 ;
+end
+
+data_old = handles.select_rect_to_plot.Data ;
+
+data = sort_table(data_old, 2) ;
+
+set(handles.select_rect_to_plot, 'Data', data)
+
+disp('classement par robustesse')
+
+
+
 % --- Executes on button press in BUT_plot_signal.
 function BUT_plot_signal_Callback(hObject, eventdata, handles)
 % hObject    handle to BUT_plot_signal (see GCBO)
@@ -348,14 +385,16 @@ function MENU_Menu_Callback(hObject, ~, handles)
 
 
 % --------------------------------------------------------------------
-function MENU_open_Callback(hObject, ~, handles)
+function MENU_open_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_open (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 [filename, Pathname] = uigetfile ;
 addpath(Pathname)
-open(filename)
-set_param 
+data = open(filename) ;
+global DATA
+DATA = struct('exp',data.data.exp_comp) ;
+set_param(hObject, eventdata, handles) 
 
 
 % --------------------------------------------------------------------
