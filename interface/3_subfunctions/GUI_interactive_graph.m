@@ -22,7 +22,7 @@ function varargout = GUI_interactive_graph(varargin)
 
 % Edit the above text to modify the response to help GUI_interactive_graph
 
-% Last Modified by GUIDE v2.5 26-Jul-2017 18:28:03
+% Last Modified by GUIDE v2.5 16-Aug-2017 10:31:42
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -57,7 +57,8 @@ first_simu = 1 ;
 global start n
 start = 1 ;
 n = 0 ;
-global W_ROB MIN_SAMPLE MAX_SIMU MAX_TIME 
+global W_ROB MIN_SAMPLE MAX_SIMU MAX_TIME  r
+r = 0 ;
 W_ROB = 0.5 ; 
 MIN_SAMPLE = 10 ; 
 MAX_SIMU = 200 ; 
@@ -563,11 +564,12 @@ disp('- Plot the rectangle containing the point with the lowest robustness')
 
 
 % --------------------------------------------------------------------
-function MENU_Prop_Callback(hObject, eventdata, handles)
-% hObject    handle to MENU_Prop (see GCBO)
+function MENU_Param_Callback(hObject, eventdata, handles)
+% hObject    handle to MENU_Param (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 selection_param
+global DATA
 if ~isempty(DATA)
     set_param (hObject, eventdata, handles)
 end
