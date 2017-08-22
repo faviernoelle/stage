@@ -8,6 +8,8 @@ function plot_new_rectangles(Out,i, j,column, PARAM)
 % the edge of this rectangle will be columnoured
 % limits = table contening the limits of all dimensions of the data
 
+
+
 % Value to enter in rectangle with propriety 'position' :
 % [ x, y, w, h ]
 % x = left bottom corner of the rectangle on x

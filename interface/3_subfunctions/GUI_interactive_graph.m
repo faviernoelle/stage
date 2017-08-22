@@ -106,6 +106,7 @@ end
 disp('- Set properties of the graph on the left')
 % set(handles.GRAPH_graph1,'ButtonDownFcn',{@MouseClicking handles});
 % set(handles.GRAPH_graph1,'ButtonDownFcn',{@Test handles});
+% Make the graph on the right interactive
 set(hObject,'WindowButtonDownFcn',{@MouseClicking handles})
 
 disp('End initialization')
@@ -138,7 +139,6 @@ global PARAM DATA
 
 axes(handles.GRAPH_graph1)
 cla %clear axe on the right
-
 data = handles.select_dim_and_limits.Data ;
 
 test_x = zeros(10,1) ;
@@ -159,13 +159,17 @@ plot_new_rectangles(DATA.exp, x, y, 1, PARAM)
 
 
 function CellSelectionCallback(hObject, eventdata, handles)
-% disp('column selected')
+
+% When the user selects a line the rectangle corresponding will be plotted.
+
+disp('column selected')
 
 axes(handles.GRAPH_graph1)
 cla % clear axe on the right
 
 global PARAM DATA
 
+% get data to communicate with the user
 data1 = handles.select_rect_to_plot.Data ;
 data2 = handles.select_dim_and_limits.Data ;
 
@@ -177,30 +181,31 @@ end
 x = find(test_x == 1) ;
 y = find(test_x == 2) ;
 
-
 Cellule = eventdata.Indices;
 if isempty(Cellule)
     Cellule= [1 1] ;
 end
 rectangle_to_plot = data1(Cellule(1), 1) ;
 
+% Communication with the user
 disp(['rectangle sélectionné : ', num2str(rectangle_to_plot)])
 
+% Remember selected rectangle
 set(handles.TXT_rect_selected,'String',rectangle_to_plot) ;
 
+% actualize plot
 plot_new_rectangles(DATA.exp, x, y, rectangle_to_plot, PARAM)
 
 
 function MouseClicking(~, eventdata, handles)
 
 % function which act when the click is used :
-% When we do a left click in every case disp (left click) and
+% When the user does a left click in every case disp : left click and
     % if it's on a point -> plot robustness value
     % if it's not on a point -> do nothing
 % left click clear texts on the figure
     
 global DATA PARAM
-
 
 data2 = handles.select_dim_and_limits.Data ;
 
@@ -209,10 +214,11 @@ for i= 1:PARAM.Nb_point
     test_x(i) = data2{i,2} ;
 end
 
+% Get the two selected dimensions 
 x = find(test_x == 1) ;
 y = find(test_x == 2) ;
 
-
+% Get selected rectangle
 rectangle_to_plot = str2double(get(handles.TXT_rect_selected,'String')) ;
 
 % Left click
@@ -270,6 +276,7 @@ if strcmpi(get(gcf,'SelectionType'), 'Normal')
     if line ~= 0
         % Write robustness value on the graph, the first two values are
         % used to define the position where the text will be written
+        
         % Writte robustness
         text(DATA.exp.clusters{rectangle_to_plot}.pts(line,x),...
             DATA.exp.clusters{rectangle_to_plot}.pts(line,y), ...
@@ -298,17 +305,22 @@ function BUT_cov_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+% Prevent the user for selecting both buttons
 if handles.BUT_cov.Value  == 1
     handles.BUT_rob.Value = 0 ;
 end
 
+% Get data
 data_old = handles.select_rect_to_plot.Data ;
 
+% Sort data 
 data = sort_table(data_old, 3) ;
 
+% Writte new data on the table
 set(handles.select_rect_to_plot, 'Data', data)
 
-disp('classement par coverage')
+% Communicate with the user
+disp('Sorted by coverage')
 
 
 function BUT_rob_Callback(hObject, eventdata, handles)
@@ -320,13 +332,17 @@ if handles.BUT_rob.Value  == 1
     handles.BUT_cov.Value = 0 ;
 end
 
+% Get data
 data_old = handles.select_rect_to_plot.Data ;
 
+% Sort data 
 data = sort_table(data_old, 2) ;
 
+% Writte new data on the table
 set(handles.select_rect_to_plot, 'Data', data)
 
-disp('classement par robustesse')
+% Communicate with the user
+disp('Sorted by robustness')
 
 
 
@@ -338,6 +354,7 @@ function BUT_plot_signal_Callback(hObject, eventdata, handles)
 
 global PARAM DATA 
 
+% Get data
 data2 = handles.select_dim_and_limits.Data ;
 
 test_x = zeros(10,1) ;
@@ -345,12 +362,178 @@ for i= 1:PARAM.Nb_point
  test_x(i) = data2{i,2} ;
 end
 
+% Find dimensions selected
 x = find(test_x == 1) ;
 y = find(test_x == 2) ;
 
+% Remember selected rectangle
 rectangle_to_plot = str2double(get(handles.TXT_rect_selected,'String')) ;
 
+% Actualize the plot
 plot_signal(DATA.exp,x,y,rectangle_to_plot, PARAM)
+
+
+% --- Executes on button press in BUT_start_simu.
+function BUT_start_simu_Callback(hObject, eventdata, handles)
+% hObject    handle to BUT_start_simu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+set(handles.BUT_stop_simu,'Visible','On')
+set(handles.BUT_start_simu,'Visible','Off')
+
+global first_simu Out DATA start COVERAGE n PARAM
+
+global r CBS phi
+
+global W_ROB MIN_SAMPLE MAX_SIMU MAX_TIME 
+
+w_rob = W_ROB ;
+init_sim = MIN_SAMPLE ;
+max_sim = MAX_SIMU ;
+time_lim = MAX_TIME ; 
+
+coverage = COVERAGE ;
+
+if first_simu ~= 1
+    cbs_reinit     
+else 
+    Out = [] ;
+    COVERAGE = [] ;
+    first_simu = 0 ;
+end
+
+% Lancer simulation
+disp('Lancer simu')
+
+rng(r,'twister');  
+timervar_1 = tic;
+
+% Start the simulation and continue it until start becomes 0 and that
+% number of simulation < max number of simulations
+start = 1 ;
+while n <= max_sim  && start == 1 
+    nb_before_calc_coverage = 20 ; 
+    Out = StatFalsify(Out, CBS, phi, w_rob, init_sim, ...
+        nb_before_calc_coverage, time_lim) ;
+    coverage = [coverage ; compute_global_coverage(Out, PARAM) ] ;
+    COVERAGE = coverage ;
+    n = Out.num_samples(1,1) ;
+end
+
+set(handles.BUT_start_simu,'String', 'Continue')
+set(handles.BUT_start_simu,'Visible','On')
+
+% Save data
+DATA = struct('exp', Out) ;
+
+% Parameter to continue simulation without problems (without that when we
+% start again the simulation, the same points are created again.
+r = DATA.exp.num_samples(1) ;
+
+set_param(hObject,eventdata,handles)
+  
+fname = ['cl',num2str(r)];
+save(fname, 'Out')
+
+
+% --- Executes on button press in BUT_stop_simu.
+function BUT_stop_simu_Callback(hObject, eventdata, handles)
+% hObject    handle to BUT_stop_simu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Stop the simulation when it reach a multiple of the number of simulation
+% needed to do a classification
+global start;
+start = 0 ;
+
+function set_param(hObject, eventdata, handles)
+
+% Function to initialize the interface. It is used each time a change
+% happens in the interface (for instance each time points are created, or
+% when the user opens previous data,...) 
+% it set the properties of all the objects of the GUI. 
+
+global DATA PARAM 
+
+disp('- Plot the rectangle containing the point with the lowest robustness')
+    % Get rectangle containing the point of minimal robustness
+    [rank_rob, ~, ~, ~] = sort_robustness(DATA.exp) ;
+    [~, rank_cov] = sort(DATA.exp.coverage) ;
+
+    disp('- plot global coverage and show its value ')
+    % Compute global coverage value (call function compute_global_coverage)
+    % See help compute_global_coverage to get more details
+    coverage = compute_global_coverage(DATA.exp, PARAM) ;
+    set(handles.TXT_global_coverage,'String',coverage)
+
+    % Create the settings for the tables
+    % Column names and column format
+    columnname1 = {'Rectangle','Robustness rank','Coverage rank'} ;
+    columnformat1 = {'numeric','numeric','numeric'} ;
+
+    % Column names and column format
+    columnname2 = {'Dimension','Plot axis','Rect lower bound',...
+        'Rect uppur bound', 'Plot lower Bound', 'Plot upper bound'} ;
+    columnformat2 = {'numeric','numeric','numeric','numeric','numeric','numeric'} ;
+
+    % Define data for the first table
+    d1 = 1:numel(DATA.exp.regions) ;
+    for i = 1:numel(DATA.exp.regions)
+        data1(i,:) = {d1(i) rank_rob(i) rank_cov(i)} ;
+    end
+
+    for j=1:3
+        for i=1:numel(DATA.exp.regions)
+            data_table(i,j) = data1{i,j} ;
+        end
+    end
+    
+     % Define the data for the secund table
+    d = (1:PARAM.Nb_point)' ;
+    for i=1:PARAM.Nb_point
+        data2(i,:) = {d(i) 0 0 PARAM.max_pedal_angle PARAM.tab_dim(i,2) PARAM.tab_dim(i,3)} ;   
+    end
+
+    data2{1,2} = 1 ;
+    data2{2,2} = 2 ;
+
+       
+    % Set the settings of the second table
+    set(handles.select_rect_to_plot, 'ColumnName', columnname1)
+    set(handles.select_rect_to_plot, 'ColumnFormat', columnformat1)
+    set(handles.select_rect_to_plot, 'Data', data_table)
+    set(handles.select_rect_to_plot, 'ColumnEditable',...
+        [false false false] )
+    set(handles.select_rect_to_plot, 'CellSelectionCallback', ...
+        {@CellSelectionCallback handles})
+    
+    % Set the setting for the secund table
+    set(handles.select_dim_and_limits, 'ColumnName', columnname2)
+    set(handles.select_dim_and_limits, 'ColumnFormat', columnformat2)
+    set(handles.select_dim_and_limits, 'Data', data2)
+    set(handles.select_dim_and_limits, 'ColumnEditable',...
+        [false true false false true true] )
+    set(handles.select_dim_and_limits, 'CellEditCallback', ...
+        {@CellEditCallback handles})
+
+    test_x = zeros(10,1) ;
+    for i= 1:PARAM.Nb_point
+        test_x(i) = data2{i,2} ;
+    end
+    % test_y(:) = data{:,2} ;
+
+    x = find(test_x == 1) ;
+    y = find(test_x == 2) ;
+
+    axes(handles.GRAPH_graph1)
+    plot_new_rectangles(DATA.exp, x, y, 1, PARAM) 
+
+    disp('- Hide static text for rectangle selected')
+    set(handles.TXT_rect_selected,'String',1) 
+    % to do : 
+    % plot coverage
 
 
 % --------------------------------------------------------------------
@@ -359,6 +542,7 @@ function MENU_help_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+Warning('TO DO')
 
 
 % --------------------------------------------------------------------
@@ -366,6 +550,7 @@ function MENU_license_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_license (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
 warning('TO DO')
 
 
@@ -409,159 +594,7 @@ bakCD = cd ;
 cd(Pathname) ;
 saveas(handles.figure1,Filename)
 cd(bakCD) ;
-
-
-% --- Executes on button press in BUT_start_simu.
-function BUT_start_simu_Callback(hObject, eventdata, handles)
-% hObject    handle to BUT_start_simu (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-set(handles.BUT_stop_simu,'Visible','On')
-set(handles.BUT_start_simu,'Visible','Off')
-
-global first_simu Out DATA start COVERAGE n PARAM
-
-global r CBS phi
-
-global W_ROB MIN_SAMPLE MAX_SIMU MAX_TIME 
-
-w_rob = W_ROB ;
-init_sim = MIN_SAMPLE ;
-max_sim = MAX_SIMU ;
-time_lim = MAX_TIME ; 
-
-coverage = COVERAGE ;
-
-if first_simu ~= 1
-    cbs_reinit     
-else 
-    Out = [] ;
-    COVERAGE = [] ;
-
-    first_simu = 0 ;
-end
-
-% Lancer simulation
-disp('Lancer simu')
-
-rng(r,'twister');  
-timervar_1 = tic;
-
-
-start = 1 ;
-
-while n <= max_sim  && start == 1 
-    nb_before_calc_coverage = 20 ; 
-    Out = StatFalsify(Out, CBS, phi, w_rob, init_sim, ...
-        nb_before_calc_coverage, time_lim) ;
-    coverage = [coverage ; compute_global_coverage(Out, PARAM) ] ;
-    COVERAGE = coverage ;
-    n = Out.num_samples(1,1) ;
-end
-
-set(handles.BUT_start_simu,'Visible','On')
-
-DATA = struct('exp', Out) ;
-
-r = DATA.exp.num_samples(1) ;
-
-set_param(hObject,eventdata,handles)
-
-time_1 = toc(timervar_1);  
-fname = ['cl',num2str(r)];
-save(fname, 'Out')
-
-
-
-% --- Executes on button press in BUT_stop_simu.
-function BUT_stop_simu_Callback(hObject, eventdata, handles)
-% hObject    handle to BUT_stop_simu (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-global start;
-start = 0 ;
-
-function set_param(hObject, eventdata, handles)
-
-global DATA PARAM 
-
-disp('- Plot the rectangle containing the point with the lowest robustness')
-    % Get rectangle containing the point of minimal robustness
-    [rank_rob, ~, rob] = sort_robustness(DATA.exp) ;
-    [cov, rank_cov] = sort(DATA.exp.coverage) ;
-
-    disp('- plot global coverage and show its value ')
-    % Compute global coverage value (call function compute_global_coverage)
-    % See help compute_global_coverage to get more details
-    coverage = compute_global_coverage(DATA.exp, PARAM) ;
-    set(handles.TXT_global_coverage,'String',coverage)
-
-    % Column names and column format
-    columnname1 = {'Rectangle','Robustness rank','Coverage rank'} ;
-    columnformat1 = {'numeric','numeric','numeric'} ;
-
-    % Column names and column format
-    columnname2 = {'Dimension','Plot axis','Rect lower bound',...
-        'Rect uppur bound', 'Plot lower Bound', 'Plot upper bound'} ;
-    columnformat2 = {'numeric','numeric','numeric','numeric','numeric','numeric'} ;
-
-    % Define the data of the first table
-    d = (1:PARAM.Nb_point)' ;
-    for i=1:PARAM.Nb_point
-        data2(i,:) = {d(i) 0 0 PARAM.max_pedal_angle PARAM.tab_dim(i,2) PARAM.tab_dim(i,3)} ;   
-    end
-
-    d1 = 1:numel(DATA.exp.regions) ;
-    for i = 1:numel(DATA.exp.regions)
-        data1(i,:) = {d1(i) rank_rob(i) rank_cov(i)} ;
-    end
-
-    for j=1:3
-        for i=1:numel(DATA.exp.regions)
-            data_table(i,j) = data1{i,j} ;
-        end
-    end
-
-    data2{1,2} = 1 ;
-    data2{2,2} = 2 ;
-
-    % define the data of the second table
-
-    set(handles.select_dim_and_limits, 'ColumnName', columnname2)
-    set(handles.select_dim_and_limits, 'ColumnFormat', columnformat2)
-    set(handles.select_dim_and_limits, 'Data', data2)
-    set(handles.select_dim_and_limits, 'ColumnEditable',...
-        [false true false false true true] )
-    set(handles.select_dim_and_limits, 'CellEditCallback', ...
-        {@CellEditCallback handles})
-
-    set(handles.select_rect_to_plot, 'ColumnName', columnname1)
-    set(handles.select_rect_to_plot, 'ColumnFormat', columnformat1)
-    set(handles.select_rect_to_plot, 'Data', data_table)
-    set(handles.select_rect_to_plot, 'ColumnEditable',...
-        [false false false] )
-    set(handles.select_rect_to_plot, 'CellSelectionCallback', ...
-        {@CellSelectionCallback handles})
-
-    test_x = zeros(10,1) ;
-    for i= 1:PARAM.Nb_point
-        test_x(i) = data2{i,2} ;
-    end
-    % test_y(:) = data{:,2} ;
-
-    x = find(test_x == 1) ;
-    y = find(test_x == 2) ;
-
-    axes(handles.GRAPH_graph1)
-    plot_new_rectangles(DATA.exp, x, y, 1, PARAM) 
-
-    disp('- Hide static text for rectangle selected')
-    set(handles.TXT_rect_selected,'String',1) 
-    
-    % a faire : 
-    % Tracer la couverture
-
+ 
 
 % --------------------------------------------------------------------
 function MENU_Param_Callback(hObject, eventdata, handles)
