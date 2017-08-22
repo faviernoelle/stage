@@ -46,7 +46,7 @@ fprintf('AF-Sensor Offset is constant at 1')
 fprintf('\n Grid discretization unit for Pedal Angle signal value range is 4 units\n')
 
 Sys = BrSys.copy;
-Sys.SetParamRanges(signal_u0,ones(PARAM.Nb_point,1)*[0 PARAM.max_pedal_angle]);
+Sys.SetParamRanges(signal_u0,ones(PARAM.Nb_point,1)*[PARAM.min_range PARAM.max_range]);
 Sys.SetParam(signal_u1,ones(PARAM.Nb_point,1)*PARAM.engine_speed);
 Sys.SetParam(signal_u2,ones(PARAM.Nb_point,1)*PARAM.Sensor_Offset);
 Sys.SetEpsGridsize(PARAM.Grid_discretisation);

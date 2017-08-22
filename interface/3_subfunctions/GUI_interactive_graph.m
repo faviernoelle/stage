@@ -77,10 +77,11 @@ addPath % Adding to path all subfolders of the project
 % Set properties of objects
 disp('- Set properties of objects')
 
-global DATA PARAM COVERAGE
+global DATA PARAM 
+% global COVERAGE
  
-[PARAM(:).tab_dim] = zeros(PARAM.Nb_point,3) ;
-PARAM.tab_dim(:,3) = PARAM.max_pedal_angle ; 
+[PARAM(:).tab_dim] = ones(PARAM.Nb_point,3)*PARAM.min_range ;
+PARAM.tab_dim(:,3) = PARAM.max_range ; 
 PARAM.tab_dim(:,1) = 1:PARAM.Nb_point ;
 
 % Adding images
@@ -421,7 +422,7 @@ while n <= max_sim  && start == 1
     n = Out.num_samples(1,1) ;
 end
 
-set(handles.BUT_start_simu,'String', 'Continue')
+set(handles.BUT_start_simu,'String', 'Continue Simu')
 set(handles.BUT_start_simu,'Visible','On')
 
 % Save data
@@ -459,7 +460,7 @@ global DATA PARAM
 
 disp('- Plot the rectangle containing the point with the lowest robustness')
     % Get rectangle containing the point of minimal robustness
-    [rank_rob, ~, ~, ~] = sort_robustness(DATA.exp) ;
+    [rank_rob, ~, ~] = sort_robustness(DATA.exp) ;
     [~, rank_cov] = sort(DATA.exp.coverage) ;
 
     disp('- plot global coverage and show its value ')
@@ -493,7 +494,8 @@ disp('- Plot the rectangle containing the point with the lowest robustness')
      % Define the data for the secund table
     d = (1:PARAM.Nb_point)' ;
     for i=1:PARAM.Nb_point
-        data2(i,:) = {d(i) 0 0 PARAM.max_pedal_angle PARAM.tab_dim(i,2) PARAM.tab_dim(i,3)} ;   
+        data2(i,:) = {d(i) 0 PARAM.min_range PARAM.max_range ...
+            PARAM.tab_dim(i,2) PARAM.tab_dim(i,3)} ;   
     end
 
     data2{1,2} = 1 ;
@@ -534,7 +536,9 @@ disp('- Plot the rectangle containing the point with the lowest robustness')
     set(handles.TXT_rect_selected,'String',1) 
     % to do : 
     % plot coverage
-
+    
+    set(handles.BUT_rob, 'Value', 0)
+    set(handles.BUT_cov, 'Value', 0)
 
 % --------------------------------------------------------------------
 function MENU_help_Callback(hObject, eventdata, handles)

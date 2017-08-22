@@ -67,7 +67,8 @@ Sys.SetParam(signal_u2,ones(N,1)*1);
 Sys.SetEpsGridsize(4*ones(N,1));
 Sys.SetDeltaGridsize(2*Sys.epsgridsize);
 
-[PARAM(:).max_pedal_angle] = 40 ;
+[PARAM(:).min_range] = 0 ;
+[PARAM(:).max_range] = 40 ;
 [PARAM(:).engine_speed] = 1000 ;
 [PARAM(:).Sensor_Offset] = 1 ;
 [PARAM(:).Grid_discretisation] = 4*ones(N,1) ; 

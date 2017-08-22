@@ -8,7 +8,7 @@
 
 %% Clean Matlab
 
-clear vars
+clear all
 close all
 clc 
 
@@ -55,3 +55,7 @@ GUI_interactive_graph
 % plot_new_rectangles(DATA.Exp3, 1, 5, 5, PARAM)
 
 % plot_robustness(DATA.Exp3, 1, 5, 5, PARAM)
+
+%  [rank, regions, line, value] = sort_robustness(DATA.exp) ;
+
+% new_data = sort_table(data,column)
